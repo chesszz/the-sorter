@@ -25,7 +25,28 @@ export const useSongsSortData = (
   const songs = useSongData();
   const [noTieMode, setNoTieMode] = useLocalStorage('dd-mode', false);
   const [heardleMode, setHeardleMode] = useLocalStorage('heardle-mode', false);
-  const [songFilters, setSongFilters] = useLocalStorage<SongFilterType>('song-filters', undefined);
+  const [songFilters, setSongFilters] = useLocalStorage<SongFilterType>(
+    'phantom-song-filters',
+    undefined
+  );
+
+  const activeSongFilters = useMemo(
+    () =>
+      songFilters
+        ? {
+            ...songFilters,
+            series: [],
+            artists: [],
+            types: [],
+            characters: [],
+            discographies: [],
+            songs: songFilters.songs.filter((songId) =>
+              songs.some((song) => Number(song.id) === songId)
+            )
+          }
+        : undefined,
+    [songFilters]
+  );
 
   // Apply performance pre-filter, then song filters, then exclude failed songs
   const listToSort = useMemo(() => {
@@ -38,8 +59,8 @@ export const useSongsSortData = (
     }
 
     // Then apply song filters on top
-    if (songFilters && hasFilter(songFilters)) {
-      filtered = filtered.filter((s) => matchSongFilter(s, songFilters));
+    if (activeSongFilters && hasFilter(activeSongFilters)) {
+      filtered = filtered.filter((s) => matchSongFilter(s, activeSongFilters));
     }
 
     if (heardleMode) {
@@ -52,7 +73,7 @@ export const useSongsSortData = (
     }
 
     return filtered;
-  }, [songs, songFilters, excludedSongIds, options?.performanceSongIds, heardleMode]);
+  }, [songs, activeSongFilters, excludedSongIds, options?.performanceSongIds, heardleMode]);
 
   const {
     init,
@@ -69,7 +90,7 @@ export const useSongsSortData = (
     isEnded
   } = useSorter(
     listToSort.map((l) => l.id),
-    options?.storagePrefix ?? 'songs'
+    options?.storagePrefix ?? 'phantom-songs'
   );
 
   const { toast } = useToaster();

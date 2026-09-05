@@ -6,20 +6,15 @@ import { Group } from '../ui/styled/checkbox';
 import { Text } from '../ui/text';
 
 import series from '../../../data/series-info.json';
-import artists from '../../../data/artists-info.json';
-import character from '../../../data/character-info.json';
-import discographies from '../../../data/discography-info.json';
-import songs from '../../../data/song-info.json';
+import songs from '../../../data/songs.json';
 
 import { DualListSelector } from './DualListSelector';
-import { CharacterGridSelector } from './CharacterGridSelector';
 import { Badge } from '~/components/ui/badge';
 import { HStack, Stack, Wrap, Box } from 'styled-system/jsx';
 import { isValidSongFilter } from '~/utils/song-filter';
-import { getFullPerformanceName, getSeriesName, getSongName } from '~/utils/names';
+import { getSongName } from '~/utils/names';
 import { fuzzySearch, getSearchScore } from '~/utils/search';
 import { getAllCommaSeparated } from '~/utils/share';
-import type { PerformanceSortMeta } from '~/types/performance-sort';
 
 export type SongFilterType = {
   series: string[];
@@ -32,21 +27,6 @@ export type SongFilterType = {
   years: number[];
 };
 
-const artistsWithoutCharacters = artists.filter(
-  (a) =>
-    !a.seriesIds.includes(5) &&
-    !a.seriesIds.includes(7) &&
-    ![
-      '早乙女リリエル、竜崎クロウエル、白鳥ラナエル、綾小路シェリエル、東條ネルエル',
-      '恋塚フルーネティ',
-      '神楽坂ミナモ',
-      'アサギ',
-      'ミザリィ',
-      ...'早乙女リリエル、竜崎クロウエル、白鳥ラナエル、綾小路シェリエル、東條ネルエル'.split('、')
-    ].includes(a.name) &&
-    !character.some((c) => a.name.includes(c.fullName))
-);
-
 const years = Array.from(
   new Set(
     songs
@@ -58,26 +38,20 @@ const years = Array.from(
 
 const FILTER_VALUES = {
   series: series.map((s) => s.id),
-  artists: artistsWithoutCharacters.map((v) => v.id),
+  artists: [] as string[],
   types: ['group', 'solo', 'unit'],
-  characters: character.map((c) => c.id),
-  discographies: discographies.map((d) => Number(d.id)),
+  characters: [],
+  discographies: [],
   songs: songs.map((s) => Number(s.id)),
   years: years
 } satisfies Record<keyof SongFilterType, unknown>;
 
 export function SongFilters({
   filters,
-  setFilters,
-  performanceMeta,
-  onOpenPerformancePicker,
-  onClearPerformance
+  setFilters
 }: {
   filters: SongFilterType | null | undefined;
   setFilters: Dispatch<SetStateAction<SongFilterType | null | undefined>>;
-  performanceMeta?: PerformanceSortMeta | null;
-  onOpenPerformancePicker?: () => void;
-  onClearPerformance?: () => void;
 }) {
   const { t, i18n: _i18n } = useTranslation();
 
@@ -116,7 +90,6 @@ export function SongFilters({
         years: []
       };
     });
-    onClearPerformance?.();
   };
 
   const initFilters = useCallback(() => {
@@ -194,21 +167,6 @@ export function SongFilters({
     []
   );
 
-  // Dependent Filtering Logic
-  const selectedSeriesIds = useMemo(() => filters?.series ?? [], [filters?.series]);
-
-  const filteredArtists = useMemo(() => {
-    if (selectedSeriesIds.length === 0) return artistsWithoutCharacters;
-    return artistsWithoutCharacters.filter((a) =>
-      a.seriesIds.some((sid) => selectedSeriesIds.includes(String(sid)))
-    );
-  }, [selectedSeriesIds]);
-
-  const filteredCharacters = useMemo(() => {
-    if (selectedSeriesIds.length === 0) return character;
-    return character.filter((c) => selectedSeriesIds.includes(String(c.seriesId)));
-  }, [selectedSeriesIds]);
-
   // Helper for series color mapping
   const seriesColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -218,49 +176,7 @@ export function SongFilters({
     return map;
   }, []);
 
-  const artistItems = useMemo(
-    () =>
-      filteredArtists.map((a) => ({
-        id: a.id,
-        name: _i18n.language === 'en' ? a.englishName || a.name : a.name,
-        category: seriesMap[String(a.seriesIds[0])],
-        color: seriesColorMap[String(a.seriesIds[0])],
-        englishName: a.englishName
-      })),
-    [filteredArtists, _i18n.language, seriesMap, seriesColorMap]
-  );
-
-  const characterItems = useMemo(
-    () =>
-      filteredCharacters.map((c) => ({
-        id: Number(c.id),
-        name: _i18n.language === 'en' ? c.englishName || c.fullName : c.fullName,
-        category: seriesMap[c.seriesId],
-        color: c.colorCode ?? seriesColorMap[String(c.seriesId)]
-      })),
-    [filteredCharacters, _i18n.language, seriesMap, seriesColorMap]
-  );
-
-  const discographyItems = useMemo(
-    () =>
-      discographies.map((d) => ({
-        id: Number(d.id),
-        name: d.name,
-        category: d.seriesIds.map((sid) => seriesMap[String(sid)]).join(', '),
-        color: seriesColorMap[String(d.seriesIds[0])]
-      })),
-    [seriesMap, seriesColorMap]
-  );
-
-  const filteredSongs = useMemo(() => {
-    if (selectedSeriesIds.length === 0) return songs;
-    const selectedSongIds = filters?.songs ?? [];
-    return songs.filter((s) => {
-      const matchesSeries = s.seriesIds.some((sid) => selectedSeriesIds.includes(String(sid)));
-      const isAlreadySelected = selectedSongIds.includes(Number(s.id));
-      return matchesSeries || isAlreadySelected;
-    });
-  }, [selectedSeriesIds, filters?.songs]);
+  const filteredSongs = songs;
 
   const songItems = useMemo(
     () =>
@@ -275,11 +191,6 @@ export function SongFilters({
         }))
         .sort((a, b) => a.name.localeCompare(b.name, _i18n.language)),
     [filteredSongs, seriesMap, seriesColorMap, _i18n.language]
-  );
-
-  const categories = useMemo(
-    () => series.map((s) => ({ id: s.name, label: s.name, color: s.color })),
-    []
   );
 
   // Helper for Adaptive Header
@@ -328,141 +239,11 @@ export function SongFilters({
     );
   };
 
-  const seriesCount = filters?.series?.length ?? 0;
-  const artistsCount = filters?.artists?.length ?? 0;
-  const charactersCount = filters?.characters?.length ?? 0;
-  const typesCount = filters?.types?.length ?? 0;
-  const discographiesCount = filters?.discographies?.length ?? 0;
   const songsCount = filters?.songs?.length ?? 0;
   const yearsCount = filters?.years?.length ?? 0;
 
   return (
     <Stack border="1px solid" borderColor="border.default" rounded="l1" p="4">
-      {/* Series */}
-      <Stack>
-        {renderHeader(t('settings.series'), seriesCount, 'series', false)}
-        <Group
-          asChild
-          defaultValue={[]}
-          value={filters?.series ?? []}
-          onValueChange={(series) => {
-            if (!filters) return;
-            setFilters({ ...filters, series });
-          }}
-        >
-          <Wrap>
-            {series.map((s) => {
-              return (
-                <Checkbox size="sm" key={s.id} value={String(s.id)}>
-                  {getSeriesName(s.name, _i18n.language as any)}
-                </Checkbox>
-              );
-            })}
-            <Checkbox size="sm" value="cross">
-              {t('settings.cross_series')}
-            </Checkbox>
-          </Wrap>
-        </Group>
-      </Stack>
-
-      <Box height="1px" bg="border.subtle" />
-
-      {/* Artists & Characters Modals */}
-      <HStack gap="8" alignItems="flex-start" flexWrap="wrap">
-        {/* Artists */}
-        <Stack flex="1" gap="4" minW="300px">
-          {renderHeader(t('settings.artists'), artistsCount, 'artists', true)}
-
-          <DualListSelector
-            title={t('settings.artists')}
-            triggerLabel={t('settings.artists')}
-            items={artistItems}
-            selectedIds={filters?.artists ?? []}
-            onSelectionChange={(ids) => {
-              if (!filters) return;
-              setFilters({ ...filters, artists: ids.map(String) });
-            }}
-            categories={categories}
-            searchFilter={fuzzySearch}
-            getSearchScore={getSearchScore}
-          />
-
-          {filters?.artists && filters.artists.length > 0 && (
-            <HStack gap="2" pt="2" flexWrap="wrap">
-              {filters.artists.map((artistId) => {
-                const artist = artistItems.find((a) => String(a.id) === artistId);
-                if (!artist) return null;
-                return (
-                  <Badge key={artistId} variant="subtle" size="sm">
-                    {artist.name}
-                  </Badge>
-                );
-              })}
-            </HStack>
-          )}
-        </Stack>
-
-        {/* Characters */}
-        <Stack flex="1" gap="4" minW="300px">
-          {renderHeader(t('settings.characters'), charactersCount, 'characters', true)}
-
-          <CharacterGridSelector
-            title={t('settings.characters')}
-            triggerLabel={t('settings.characters')}
-            characters={filteredCharacters}
-            selectedIds={filters?.characters ?? []}
-            onSelectionChange={(ids) => {
-              if (!filters) return;
-              setFilters({ ...filters, characters: ids });
-            }}
-          />
-
-          <Text color="fg.muted" fontSize="sm">
-            {t('settings.character_solo_hint')}
-          </Text>
-
-          {filters?.characters && filters.characters.length > 0 && (
-            <HStack gap="2" pt="2" flexWrap="wrap">
-              {filters.characters.map((charId) => {
-                const char = characterItems.find((c) => Number(c.id) === charId);
-                if (!char) return null;
-                return (
-                  <Badge key={charId} variant="subtle" size="sm">
-                    {char.name}
-                  </Badge>
-                );
-              })}
-            </HStack>
-          )}
-        </Stack>
-      </HStack>
-
-      <Box height="1px" bg="border.subtle" />
-
-      {/* Types */}
-      <Stack>
-        {renderHeader(t('settings.types'), typesCount, 'types', false)}
-        <Group
-          asChild
-          defaultValue={[]}
-          value={filters?.types}
-          onValueChange={(types) => {
-            if (!filters) return;
-            setFilters({ ...filters, types: types as ('group' | 'solo' | 'unit')[] });
-          }}
-        >
-          <Wrap>
-            {FILTER_VALUES.types.map((type) => (
-              <Checkbox size="sm" key={type} value={type}>
-                {t(`settings.type.${type}`)}
-              </Checkbox>
-            ))}
-          </Wrap>
-        </Group>
-      </Stack>
-
-      <Box height="1px" bg="border.subtle" />
-
       {/* Years */}
       <Stack>
         {renderHeader(t('settings.years'), yearsCount, 'years', false)}
@@ -487,39 +268,6 @@ export function SongFilters({
 
       <Box height="1px" bg="border.subtle" />
 
-      {/* Discographies */}
-      <Stack>
-        {renderHeader(t('settings.discographies'), discographiesCount, 'discographies', true)}
-        <DualListSelector
-          title={t('settings.discographies')}
-          triggerLabel={t('settings.discographies')}
-          items={discographyItems}
-          selectedIds={filters?.discographies ?? []}
-          onSelectionChange={(ids) => {
-            if (!filters) return;
-            setFilters({ ...filters, discographies: ids.map(Number) });
-          }}
-          categories={categories}
-          searchFilter={fuzzySearch}
-          getSearchScore={getSearchScore}
-        />
-        {filters?.discographies && filters.discographies.length > 0 && (
-          <HStack gap="2" pt="2" flexWrap="wrap">
-            {filters.discographies.map((discId) => {
-              const disc = discographyItems.find((d) => Number(d.id) === discId);
-              if (!disc) return null;
-              return (
-                <Badge key={discId} variant="subtle" size="sm">
-                  {disc.name}
-                </Badge>
-              );
-            })}
-          </HStack>
-        )}
-      </Stack>
-
-      <Box height="1px" bg="border.subtle" />
-
       {/* Songs */}
       <Stack>
         {renderHeader(t('settings.songs') || 'Songs', songsCount, 'songs', true)}
@@ -532,7 +280,6 @@ export function SongFilters({
             if (!filters) return;
             setFilters({ ...filters, songs: ids.map(Number) });
           }}
-          categories={categories}
           searchFilter={fuzzySearch}
           getSearchScore={getSearchScore}
         />
@@ -544,37 +291,6 @@ export function SongFilters({
           </HStack>
         )}
       </Stack>
-
-      {onOpenPerformancePicker && (
-        <>
-          <Box height="1px" bg="border.subtle" />
-
-          {/* Performances */}
-          <Stack>
-            <HStack justifyContent="space-between" alignItems="center" h="8">
-              <Text fontWeight="bold">{t('settings.performances')}</Text>
-              {performanceMeta && onClearPerformance && (
-                <Button size="xs" variant="outline" onClick={onClearPerformance}>
-                  {t('settings.clear_performance')}
-                </Button>
-              )}
-            </HStack>
-            <Button variant="outline" size="sm" onClick={onOpenPerformancePicker}>
-              {t('settings.performances')}
-              {performanceMeta && (
-                <Badge ml="2">{performanceMeta.performanceIds?.length ?? 1}</Badge>
-              )}
-            </Button>
-            {performanceMeta && (
-              <HStack gap="2" pt="2" flexWrap="wrap">
-                <Badge variant="subtle" size="sm">
-                  {getFullPerformanceName(performanceMeta)}
-                </Badge>
-              </HStack>
-            )}
-          </Stack>
-        </>
-      )}
 
       <HStack justifyContent="center">
         <Button onClick={deselectAll}>{t('settings.deselect_all')}</Button>

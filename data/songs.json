@@ -1,0 +1,322 @@
+[
+  {
+    "id": "14",
+    "name": "おともだち",
+    "phoneticName": "おともだち",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Otomodachi",
+    "releasedOn": "2024-06-26",
+    "musicVideo": {
+      "videoId": "ElWhuHTkbik",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/14.jpg"
+  },
+  {
+    "id": "9",
+    "name": "キミと××××したいだけ",
+    "phoneticName": "キミと××××したいだけ",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Just Wanna XXXX With You",
+    "releasedOn": "2024-07-31",
+    "musicVideo": {
+      "videoId": "GKlfi1PLlrE",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/9.jpg"
+  },
+  {
+    "id": "4",
+    "name": "魔性少女",
+    "phoneticName": "魔性少女",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Devilish Girl",
+    "releasedOn": "2024-08-28",
+    "musicVideo": {
+      "videoId": "msCAKVaoZzA",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/4.jpg"
+  },
+  {
+    "id": "6",
+    "name": "花喰み",
+    "phoneticName": "花喰み",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Hanabami",
+    "releasedOn": "2024-09-27",
+    "musicVideo": {
+      "videoId": "Q2dkzGTMORk",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/6.jpg"
+  },
+  {
+    "id": "3",
+    "name": "乙女心中",
+    "phoneticName": "乙女心中",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Conflicting",
+    "releasedOn": "2024-10-10",
+    "musicVideo": {
+      "videoId": "8LhWRqcAdFU",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/3.jpg"
+  },
+  {
+    "id": "16",
+    "name": "ゾクゾク",
+    "phoneticName": "ゾクゾク",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Zoku Zoku",
+    "releasedOn": "2024-10-25",
+    "musicVideo": {
+      "videoId": "LJT60DbmjHY",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/16.jpg"
+  },
+  {
+    "id": "7",
+    "name": "花筐",
+    "phoneticName": "花筐",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "HANAGATAMI",
+    "releasedOn": "2024-10-30",
+    "musicVideo": {
+      "videoId": "2Y2bNKE2KbU",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/7.jpg"
+  },
+  {
+    "id": "15",
+    "name": "すき、きらい",
+    "phoneticName": "すき、きらい",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Suki, Kirai",
+    "releasedOn": "2025-07-09",
+    "musicVideo": {
+      "videoId": "8EeC4tNZujw",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/15.jpg"
+  },
+  {
+    "id": "5",
+    "name": "そっくりさん",
+    "phoneticName": "そっくりさん",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Doppelganger",
+    "releasedOn": "2025-07-09",
+    "musicVideo": {
+      "videoId": "X7bSQ_SM6Fc",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/5.jpg"
+  },
+  {
+    "id": "13",
+    "name": "ノア",
+    "phoneticName": "ノア",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "NOAH",
+    "releasedOn": "2025-08-25",
+    "musicVideo": {
+      "videoId": "u08nuK222Kg",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/13.jpg"
+  },
+  {
+    "id": "2",
+    "name": "botばっか",
+    "phoneticName": "botばっか",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Bot Bakka",
+    "releasedOn": "2025-11-11",
+    "musicVideo": {
+      "videoId": "DBCAXbuxiMM",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/2.jpg"
+  },
+  {
+    "id": "1",
+    "name": "薔薇色の月",
+    "phoneticName": "薔薇色の月",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Barairo no Tsuki",
+    "releasedOn": "2026-01-30",
+    "musicVideo": {
+      "videoId": "hk6Jbpjj034",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/1.jpg"
+  },
+  {
+    "id": "10",
+    "name": "輪廻る",
+    "phoneticName": "輪廻る",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Meguru",
+    "releasedOn": "2026-04-01",
+    "musicVideo": {
+      "videoId": "eMmFxg79coo",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/10.jpg"
+  },
+  {
+    "id": "11",
+    "name": "もーいーかい？",
+    "phoneticName": "もーいーかい？",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Mou ii kai?",
+    "releasedOn": "2026-04-05",
+    "musicVideo": {
+      "videoId": "RCADUDB9QU4",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/11.jpg"
+  },
+  {
+    "id": "8",
+    "name": "ホラークイーン",
+    "phoneticName": "ホラークイーン",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Horror Queen",
+    "releasedOn": "2026-06-24",
+    "musicVideo": {
+      "videoId": "m8J3g2KEsd8",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/8.jpg"
+  },
+  {
+    "id": "12",
+    "name": "人魚姫の歌",
+    "phoneticName": "人魚姫の歌",
+    "seriesIds": [],
+    "artists": [
+      {
+        "id": "phantom-siita",
+        "variant": null
+      }
+    ],
+    "discographyIds": [],
+    "englishName": "Ningyo Hime no Uta",
+    "releasedOn": "2026-08-14",
+    "musicVideo": {
+      "videoId": "kaTrPCBk31Y",
+      "videoOffset": 0
+    },
+    "thumbnail": "assets/songs/thumbnails/12.jpg"
+  }
+]

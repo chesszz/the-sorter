@@ -7,5 +7,9 @@ export default {
 
   stream: true,
 
+  redirects: {
+    '/': '/songs'
+  },
+
   extends: [vikeReact]
 };

@@ -195,6 +195,7 @@ export function SongCard({
             <Center w="full" maxW="full" h="full">
               {showInfo && song.musicVideo && (
                 <iframe
+                  key={song.musicVideo.videoId}
                   style={{ maxWidth: '100%' }}
                   height="240"
                   src={`https://www.youtube-nocookie.com/embed/${song.musicVideo.videoId}/?start=${song.musicVideo.videoOffset}&html5=1`}

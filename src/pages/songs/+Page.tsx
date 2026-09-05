@@ -455,17 +455,6 @@ export function Page() {
     setPerformanceMeta(meta);
   };
 
-  const clearPerformanceMode = () => {
-    setPerformanceMeta(undefined);
-    setPerformanceSongIds(undefined);
-    // Clear performance sort state from localStorage
-    for (const key of Object.keys(localStorage)) {
-      if (key.startsWith('perf-songs-')) {
-        localStorage.removeItem(key);
-      }
-    }
-  };
-
   return (
     <>
       <Metadata title={title} helmet />
@@ -480,13 +469,7 @@ export function Page() {
               {import.meta.env.SSR ? (
                 <LoadingCharacterFilters />
               ) : (
-                <SongFilters
-                  filters={songFilters}
-                  setFilters={setSongFilters}
-                  performanceMeta={performanceMeta}
-                  onOpenPerformancePicker={() => setShowPerformancePicker(true)}
-                  onClearPerformance={clearPerformanceMode}
-                />
+                <SongFilters filters={songFilters} setFilters={setSongFilters} />
               )}
             </Suspense>
             <Wrap>

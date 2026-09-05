@@ -25,42 +25,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return (
       <>
         <Link
-          href={join(import.meta.env.BASE_URL, '/')}
-          data-active={currentPath === join(import.meta.env.BASE_URL, '/') ? true : undefined}
-          onClick={() => setIsDrawerOpen(false)}
-          _active={{ fontWeight: 'bold' }}
-        >
-          {t(`navigation.characters`)}
-        </Link>
-        <Link
           href={join(import.meta.env.BASE_URL, '/songs')}
           data-active={currentPath === join(import.meta.env.BASE_URL, '/songs') ? true : undefined}
           onClick={() => setIsDrawerOpen(false)}
           _active={{ fontWeight: 'bold' }}
         >
           {t(`navigation.songs`)}
-        </Link>
-        <Link
-          href={join(import.meta.env.BASE_URL, '/hasu-music')}
-          data-active={
-            currentPath === join(import.meta.env.BASE_URL, '/hasu-music') ? true : undefined
-          }
-          onClick={() => setIsDrawerOpen(false)}
-          _active={{ fontWeight: 'bold' }}
-        >
-          {t(`navigation.hasu-music`)}
-        </Link>
-        <Link
-          href={join(import.meta.env.BASE_URL, '/setlist-prediction')}
-          data-active={
-            currentPath.startsWith(join(import.meta.env.BASE_URL, '/setlist-prediction'))
-              ? true
-              : undefined
-          }
-          onClick={() => setIsDrawerOpen(false)}
-          _active={{ fontWeight: 'bold' }}
-        >
-          {t(`navigation.setlist-prediction`)}
         </Link>
       </>
     );
