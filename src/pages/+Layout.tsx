@@ -100,7 +100,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <Box
         style={{
-          ['--bg-image' as 'backgroundImage']: `url('${getAssetUrl('/assets/bg.webp')}')`
+          ['--bg-image' as 'backgroundImage']: `url('${getAssetUrl('/assets/bg.jpg')}')`
         }}
         zIndex="0"
         position="fixed"

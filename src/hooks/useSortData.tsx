@@ -72,7 +72,7 @@ export const useSortData = () => {
     const isMobile = window.matchMedia(`(max-width: ${token('breakpoints.sm')})`).matches;
     if (!noTieMode) {
       toast?.({
-        meta: { backgroundImage: getAssetUrl('/assets/bg.webp') },
+        meta: { backgroundImage: getAssetUrl('/assets/bg.jpg') },
         description: TieToastContent,
         duration: 1000,
         placement: isMobile ? 'top' : undefined
