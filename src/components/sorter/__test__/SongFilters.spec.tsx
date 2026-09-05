@@ -36,6 +36,7 @@ void i18n.use(initReactI18next).init({
         'settings.character_solo_hint': 'Tip: enable Type → Solo for solo songs only.',
         'settings.discographies': 'Discographies',
         'settings.songs': 'Songs',
+        'settings.years': 'Years',
         'settings.select_all': 'Select All',
         'settings.deselect_all': 'Deselect All',
         'settings.type.group': 'Group',
@@ -58,7 +59,7 @@ const mockFilters: SongFilterType = {
 };
 
 describe('SongFilters Component', () => {
-  it('renders all filter sections', () => {
+  it('renders only the song and year filters', () => {
     const setFilters = vi.fn();
     render(
       <I18nextProvider i18n={i18n}>
@@ -66,26 +67,16 @@ describe('SongFilters Component', () => {
       </I18nextProvider>
     );
 
-    expect(screen.getAllByText('Series')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Types')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Artists')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Characters')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Discographies')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Songs')[0]).toBeInTheDocument();
+    expect(screen.getByText('Years')).toBeInTheDocument();
+    expect(screen.getAllByText('Songs').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Series')).not.toBeInTheDocument();
+    expect(screen.queryByText('Artists')).not.toBeInTheDocument();
+    expect(screen.queryByText('Types')).not.toBeInTheDocument();
+    expect(screen.queryByText('Characters')).not.toBeInTheDocument();
+    expect(screen.queryByText('Discographies')).not.toBeInTheDocument();
   });
 
-  it('guides users to the character + solo type combo', () => {
-    const setFilters = vi.fn();
-    render(
-      <I18nextProvider i18n={i18n}>
-        <SongFilters filters={mockFilters} setFilters={setFilters} />
-      </I18nextProvider>
-    );
-
-    expect(screen.getByText('Tip: enable Type → Solo for solo songs only.')).toBeInTheDocument();
-  });
-
-  it('toggles Series selection', async () => {
+  it('updates the song selection', async () => {
     const user = userEvent.setup();
     const setFilters = vi.fn();
     render(
@@ -94,27 +85,7 @@ describe('SongFilters Component', () => {
       </I18nextProvider>
     );
 
-    // Assuming Series are rendered as Checkboxes with names from mock data
-    // Note: Use a real serie name from your data since we are importing it.
-    // 'ラブライブ！' is id 1.
-    const checkbox = screen.getByLabelText('Love Live! School idol project');
-    await user.click(checkbox);
-
-    expect(setFilters).toHaveBeenCalled();
-    // Verify the function update logic if complex, or just that it was called.
-  });
-
-  it('selects all Types', async () => {
-    const user = userEvent.setup();
-    const setFilters = vi.fn();
-    render(
-      <I18nextProvider i18n={i18n}>
-        <SongFilters filters={mockFilters} setFilters={setFilters} />
-      </I18nextProvider>
-    );
-
-    const selectAllTypes = screen.getAllByText('Select All')[1]; // 0: Series, 1: Types (order depends on layout)
-    await user.click(selectAllTypes);
+    await user.click(screen.getByRole('button', { name: 'Add Mock Item' }));
 
     expect(setFilters).toHaveBeenCalled();
   });

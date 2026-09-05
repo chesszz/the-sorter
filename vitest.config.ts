@@ -48,7 +48,7 @@ export default defineConfig({
       ]
     },
     outputFile: {
-      'json-summary': './coverage-summary.json'
+      'json-summary': './coverage/coverage-summary.json'
     },
     exclude: [...configDefaults.exclude]
   }

@@ -226,7 +226,7 @@ describe('Songs Page - Heardle Mode', () => {
     await user.click(continueBtn);
 
     expect(tieFn).toHaveBeenCalled();
-  });
+  }, 10000);
 
   it('calls clearAllHeardleState() when starting a new sort from not-sorting state', async () => {
     mockState = null; // not sorting

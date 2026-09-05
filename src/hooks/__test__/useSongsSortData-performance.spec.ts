@@ -121,10 +121,10 @@ describe('useSongsSortData performance mode', () => {
     expect(useSorter).toHaveBeenCalledWith(expect.any(Array), 'perf-songs');
   });
 
-  it('uses default storagePrefix "songs" when not specified', () => {
+  it('uses the Phantom Siita storagePrefix when not specified', () => {
     renderHook(() => useSongsSortData());
 
-    expect(useSorter).toHaveBeenCalledWith(expect.any(Array), 'songs');
+    expect(useSorter).toHaveBeenCalledWith(expect.any(Array), 'phantom-songs');
   });
 
   it('excludes failed song IDs from performance songs', () => {

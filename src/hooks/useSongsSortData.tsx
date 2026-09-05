@@ -45,7 +45,7 @@ export const useSongsSortData = (
             )
           }
         : undefined,
-    [songFilters]
+    [songFilters, songs]
   );
 
   // Apply performance pre-filter, then song filters, then exclude failed songs
