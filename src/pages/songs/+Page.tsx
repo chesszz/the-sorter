@@ -480,13 +480,6 @@ export function Page() {
               >
                 {t('settings.no_tie_mode')}
               </Switch>
-              <Switch
-                checked={heardleMode}
-                disabled={isSorting}
-                onCheckedChange={(e) => setHeardleMode(e.checked)}
-              >
-                {t('settings.heardle_mode')}
-              </Switch>
             </Wrap>
           </>
         )}

@@ -29,7 +29,7 @@
     "units": "Units",
     "select_all": "Select All",
     "deselect_all": "Deselect All",
-    "no_tie_mode": "No DD Allowed Mode (Hard)",
+    "no_tie_mode": "No Ties Allowed",
     "heardle_mode": "Heardle Mode",
     "generation": {
       "103": "103th",
@@ -97,7 +97,7 @@
   "sort": {
     "start": "Start",
     "start_over": "Start Over",
-    "stop": "Stop",
+    "stop": "Reset",
     "new_settings": "Choose new settings",
     "tie": "Tie",
     "undo": "Undo",

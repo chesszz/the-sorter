@@ -27,7 +27,7 @@
     "units": "ユニット",
     "select_all": "全部を選択する",
     "deselect_all": "クリアする",
-    "no_tie_mode": "DD禁止モード",
+    "no_tie_mode": "引き分けなし",
     "heardle_mode": "イントロドンモード",
     "artists": "アーティスト",
     "generation": {
@@ -95,7 +95,7 @@
   "sort": {
     "start": "開始",
     "start_over": "やり直す",
-    "stop": "中止",
+    "stop": "リセット",
     "new_settings": "設定を変更する",
     "tie": "引き分け",
     "undo": "やり直し",

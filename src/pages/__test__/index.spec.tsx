@@ -90,7 +90,7 @@ describe('Home Page', () => {
         const [container, user] = await render(<Page />);
         const { findByText } = container;
         await selectPreset(container, user, 'Cerise Bouquet');
-        await user.click(await findByText('No DD Allowed Mode (Hard)', {}, {}));
+        await user.click(await findByText('No Ties Allowed', {}, {}));
         await user.click(await findByText('Start', {}, {}));
         expect(await findByText('Tie')).toBeDisabled();
         expect(await findByText('0%')).toBeVisible();
@@ -205,7 +205,7 @@ describe('Home Page', () => {
       await selectCurrentItem(container, user);
       expect(queryByText('0%')).toBeNull();
 
-      await user.click(await findByText('Stop'));
+      await user.click(await findByText('Reset'));
       const modalTitle = await findByText('Sorting in progress');
       expect(modalTitle).toBeVisible();
       await user.click(await findByText('Cancel'));
@@ -213,7 +213,7 @@ describe('Home Page', () => {
         await waitForElementToBeRemoved(modalTitle);
       } catch {}
 
-      await user.click(await findByText('Stop'));
+      await user.click(await findByText('Reset'));
       expect(await findByText('Sorting in progress')).toBeVisible();
       await user.click(await findByText('Proceed'));
       expect(await findByText('Start')).toBeVisible();
