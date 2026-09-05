@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { FaYoutube } from 'react-icons/fa6';
 import { Text } from '../ui/text';
 import type { StackProps } from 'styled-system/jsx';
 import { Center, Box, HStack, Stack } from 'styled-system/jsx';
@@ -6,6 +7,7 @@ import { token } from 'styled-system/tokens';
 import type { Artist, Song } from '~/types/songs';
 import { getSongColor } from '~/utils/song';
 import { getArtistName, getSongName } from '~/utils/names';
+import { getAssetUrl } from '~/utils/assets';
 import { useArtistsData } from '~/hooks/useArtistsData';
 import { Heardle } from './Heardle';
 import type { GuessResult } from '~/hooks/useHeardleState';
@@ -193,30 +195,36 @@ export function SongCard({
         >
           <Center position="absolute" flex={1} w="full" h="full" overflow="hidden">
             <Center w="full" maxW="full" h="full">
-              {showInfo && song.musicVideo && (
-                <iframe
-                  key={song.musicVideo.videoId}
-                  style={{ maxWidth: '100%' }}
-                  height="240"
-                  src={`https://www.youtube-nocookie.com/embed/${song.musicVideo.videoId}/?start=${song.musicVideo.videoOffset}&html5=1`}
-                  title="YouTube video player"
-                  //@ts-expect-error wtf
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  // oxlint-disable-next-line iframe-missing-sandbox shut up linter
-                  sandbox="allow-scripts allow-same-origin"
-                  allowfullscreen
-                ></iframe>
+              {showInfo && song.thumbnail && (
+                <img
+                  src={getAssetUrl(song.thumbnail)}
+                  alt={getSongName(song.name, song.englishName, lang)}
+                  loading="lazy"
+                  style={{ width: '100%', height: '240px', objectFit: 'contain' }}
+                />
               )}
             </Center>
           </Center>
         </Stack>
       )}
       <Stack gap={0} alignItems="center">
-        <Text layerStyle="textStroke" color="var(--color)" fontSize="2xl" fontWeight="bold">
-          {showInfo && getSongName(song.name, song.englishName, lang)}
-        </Text>
+        <HStack gap="2" justifyContent="center">
+          <Text layerStyle="textStroke" color="var(--color)" fontSize="2xl" fontWeight="bold">
+            {showInfo && getSongName(song.name, song.englishName, lang)}
+          </Text>
+          {showInfo && song.musicVideo && (
+            <a
+              href={`https://www.youtube.com/watch?v=${song.musicVideo.videoId}`}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Open ${getSongName(song.name, song.englishName, lang)} on YouTube`}
+              onClick={(event) => event.stopPropagation()}
+              style={{ color: '#ff0000', display: 'inline-flex' }}
+            >
+              <FaYoutube size={24} />
+            </a>
+          )}
+        </HStack>
         {showInfo && lang === 'en' && song.englishName && (
           <Text color="fg.muted" fontSize="xs">
             {song.name}

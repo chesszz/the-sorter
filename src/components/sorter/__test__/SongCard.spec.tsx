@@ -20,6 +20,7 @@ const createMockSong = (overrides: Partial<Song> = {}): Song =>
     seriesIds: [1],
     releasedOn: '2024-01-01',
     musicVideo: { videoId: 'abc123', videoOffset: 0 },
+    thumbnail: 'assets/songs/thumbnails/song-1.jpg',
     artists: [{ id: '1', variant: null }],
     discographyIds: [1],
     wikiAudioUrl: 'https://example.com/audio.ogg',
@@ -31,16 +32,17 @@ describe('SongCard', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders song name and YouTube iframe in normal mode', async () => {
+  it('renders song name, thumbnail, and YouTube link in normal mode', async () => {
     const song = createMockSong();
 
     const [{ getByText, container }] = await render(<SongCard song={song} heardleMode={false} />);
 
     // In English mode, getSongName returns name (no englishName set)
     expect(getByText('Test Song')).toBeInTheDocument();
-    const iframe = container.querySelector('iframe');
-    expect(iframe).toBeInTheDocument();
-    expect(iframe?.src).toContain('abc123');
+    expect(container.querySelector('img')).toBeInTheDocument();
+    expect(
+      container.querySelector('a[href="https://www.youtube.com/watch?v=abc123"]')
+    ).toBeInTheDocument();
   });
 
   it('returns null when no song provided', async () => {
@@ -69,7 +71,7 @@ describe('SongCard', () => {
     expect(getByTestId('heardle-component')).toBeInTheDocument();
   });
 
-  it('hides song name and iframe when in heardle mode and not revealed', async () => {
+  it('hides song name and thumbnail when in heardle mode and not revealed', async () => {
     const song = createMockSong();
 
     const [{ queryByText, container }] = await render(
@@ -86,11 +88,10 @@ describe('SongCard', () => {
 
     // Song name should not be visible (showInfo = false)
     expect(queryByText('Test Song')).not.toBeInTheDocument();
-    // iframe should not be present
-    expect(container.querySelector('iframe')).not.toBeInTheDocument();
+    expect(container.querySelector('img')).not.toBeInTheDocument();
   });
 
-  it('shows song info and iframe after reveal', async () => {
+  it('shows song info and thumbnail after reveal', async () => {
     const song = createMockSong();
 
     const [{ getByText, container }] = await render(
@@ -107,7 +108,7 @@ describe('SongCard', () => {
 
     // When revealed, showInfo = true, showHeardle = false
     expect(getByText('Test Song')).toBeInTheDocument();
-    expect(container.querySelector('iframe')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeInTheDocument();
   });
 
   it('shows red border and FAILED badge when isFailed=true in heardle mode', async () => {
