@@ -114,6 +114,7 @@ export function SongResultsView({
       title,
       description ?? '',
       currentTab,
+      _i18n.language,
       songs.map((song) => song.id).join(','),
       order?.map((group) => group.join(',')).join('|') ?? '',
       failedSongs?.map((song) => song.id).join(',') ?? ''
@@ -395,6 +396,9 @@ export function SongResultsView({
             </HStack>
             <Text textAlign="end">
               {t('results.generated_at')}: {timestamp.toLocaleString()}
+            </Text>
+            <Text fontSize="sm" textAlign="end">
+              {t('results.generated_by')}
             </Text>
           </Stack>
         </Box>

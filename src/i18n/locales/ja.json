@@ -181,6 +181,7 @@
     "results_title": "{{ titlePrefix }}　{{ sortType }}{{ type }}",
     "default_results_title": "ラブライブ！シリーズ　{{ sortType }}{{ type }}",
     "generated_at": "作成日",
+    "generated_by": "ファントムシータ楽曲ソーターで作成 · chesszz.github.io/the-sorter/",
     "tier": "ティアリスト",
     "edit": " 結果を修正する（未完成）",
     "share_text": {
