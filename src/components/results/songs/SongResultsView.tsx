@@ -433,11 +433,12 @@ export function SongResultsView({
                   </Box>
                 ))}
             </HStack>
-            <Text fontSize="sm" textAlign="end">
-              {t('results.generated_at')}: {timestamp.toLocaleString()}
-              <br />
-              {t('results.generated_by')}
-            </Text>
+            <HStack justifyContent="space-between" width="full" fontSize="sm">
+              <Text>{t('results.generated_by')}</Text>
+              <Text textAlign="end">
+                {t('results.generated_at')}: {timestamp.toLocaleString()}
+              </Text>
+            </HStack>
           </Stack>
         </Box>
       )}
