@@ -4,6 +4,12 @@ import assert from 'node:assert/strict';
 
 const rows = [];
 const context = vm.createContext({
+  CacheService: {
+    getScriptCache: () => ({
+      get: () => undefined,
+      put() {}
+    })
+  },
   LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
   HtmlService: {
     XFrameOptionsMode: { ALLOWALL: 'allow' },
@@ -15,6 +21,17 @@ const context = vm.createContext({
     })
   }
 });
+context.UrlFetchApp = {
+  fetch: () => ({
+    getResponseCode: () => 200,
+    getContentText: () =>
+      JSON.stringify([
+        { id: '4', name: '魔性少女' },
+        { id: '9', name: 'キミと××××したいだけ' },
+        { id: '14', name: 'おともだち' }
+      ])
+  })
+};
 vm.runInContext(readFileSync('google-apps-script/Code.gs', 'utf8'), context);
 context.getSheet_ = () => ({
   appendRow: (row) => rows.push(row),

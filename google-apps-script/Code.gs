@@ -1,5 +1,8 @@
 const CONFIG = {
-  sheetName: 'submissions'
+  sheetName: 'submissions',
+  songCatalogUrl: 'https://raw.githubusercontent.com/chesszz/the-sorter/main/data/songs.json',
+  songCatalogCacheKey: 'phantom-siita-song-catalog',
+  songCatalogCacheSeconds: 300
 };
 
 const HEADERS = [
@@ -12,27 +15,6 @@ const HEADERS = [
   'updated_at',
   'ranking_summary'
 ];
-
-// The Apps Script deployment cannot import data/songs.json, so keep the
-// submission allowlist here in sync with the public song list.
-const SONG_TITLES = {
-  1: '薔薇色の月',
-  2: 'botばっか',
-  3: '乙女心中',
-  4: '魔性少女',
-  5: 'そっくりさん',
-  6: '花喰み',
-  7: 'HANAGATAMI',
-  8: 'ホラークイーン',
-  9: 'キミと××××したいだけ',
-  10: '輪廻る',
-  11: 'もーいーかい？',
-  12: '人魚姫の歌',
-  13: 'ノア',
-  14: 'おともだち',
-  15: 'すき、きらい',
-  16: 'ゾクゾク'
-};
 
 function setup() {
   const sheet = getSheet_();
@@ -193,6 +175,7 @@ function validateRanking_(ranking) {
   if (!Array.isArray(ranking) || ranking.length < 2 || ranking.length > 1000) {
     throw new Error('Rank at least two songs.');
   }
+  const songTitles = getSongTitles_();
   const seen = {};
   return ranking.map((entry) => {
     if (!entry || typeof entry !== 'object') {
@@ -201,11 +184,11 @@ function validateRanking_(ranking) {
     const songId = String(entry.songId || '');
     const songTitle = String(entry.songTitle || '').trim();
     const rank = entry.rank;
-    if (!Object.prototype.hasOwnProperty.call(SONG_TITLES, songId)) {
+    if (!Object.prototype.hasOwnProperty.call(songTitles, songId)) {
       throw new Error('The ranking contains an unknown song.');
     }
     if (seen[songId]) throw new Error('The ranking contains duplicate songs.');
-    if (songTitle !== SONG_TITLES[songId]) {
+    if (songTitle !== songTitles[songId]) {
       throw new Error('The ranking contains an invalid song title.');
     }
     if (typeof rank !== 'number' || !Number.isInteger(rank) || rank < 1 || rank > ranking.length) {
@@ -214,6 +197,40 @@ function validateRanking_(ranking) {
     seen[songId] = true;
     return { songId, rank };
   });
+}
+
+function getSongTitles_() {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get(CONFIG.songCatalogCacheKey);
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (_) {}
+  }
+
+  const response = UrlFetchApp.fetch(CONFIG.songCatalogUrl, { muteHttpExceptions: true });
+  if (response.getResponseCode() !== 200) {
+    throw new Error('The current song catalog could not be loaded.');
+  }
+
+  let songs;
+  try {
+    songs = JSON.parse(response.getContentText());
+  } catch (_) {
+    throw new Error('The current song catalog is invalid.');
+  }
+  if (!Array.isArray(songs)) throw new Error('The current song catalog is invalid.');
+
+  const titles = {};
+  songs.forEach((song) => {
+    const songId = String(song?.id || '');
+    const title = String(song?.name || '').trim();
+    if (/^\d+$/.test(songId) && title) titles[songId] = title;
+  });
+  if (Object.keys(titles).length < 2) throw new Error('The current song catalog is invalid.');
+
+  cache.put(CONFIG.songCatalogCacheKey, JSON.stringify(titles), CONFIG.songCatalogCacheSeconds);
+  return titles;
 }
 
 function formatRankingSummary_(submittedRanking, ranking) {
