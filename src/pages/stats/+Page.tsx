@@ -28,7 +28,7 @@ export function Page() {
   const [stats, setStats] = useState<CommunityStats>();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(true);
-  const [showAllIndividualRankings, setShowAllIndividualRankings] = useState(false);
+  const [expandedParticipants, setExpandedParticipants] = useState<Set<number>>(new Set());
   const names = useMemo(
     () =>
       new Map(
@@ -72,15 +72,6 @@ export function Page() {
   const contrarian = [...(stats?.participants ?? [])]
     .toSorted((a, b) => a.similarity - b.similarity)
     .slice(0, 10);
-  const individualParticipants = (() => {
-    const ranked = (stats?.participants ?? [])
-      .map((participant, index) => ({ participant, index }))
-      .toSorted((a, b) => b.participant.similarity - a.participant.similarity);
-    if (showAllIndividualRankings) return ranked;
-    const featured = [...ranked.slice(0, 5), ...ranked.slice(-5)];
-    return Array.from(new Map(featured.map((item) => [item.index, item])).values());
-  })();
-
   return (
     <>
       <Metadata title={t('community.stats_title')} helmet />
@@ -133,46 +124,78 @@ export function Page() {
               </Table.Root>
             </StatsSection>
 
-            <StatsSection
-              title={t('community.individual_rankings')}
-              action={
-                stats.participants.length > 10 && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setShowAllIndividualRankings((showAll) => !showAll)}
-                  >
-                    {showAllIndividualRankings
-                      ? t('community.show_fewer_rankings')
-                      : t('community.show_all_rankings')}
-                  </Button>
-                )
-              }
-            >
+            <StatsSection title={t('community.individual_rankings')}>
               <Table.Root size="sm">
                 <Table.Head>
                   <Table.Row>
                     <Table.Header>Name</Table.Header>
-                    {stats.songs.map((song) => (
-                      <Table.Header key={song.songId} style={{ whiteSpace: 'nowrap' }}>
-                        {songName(song.songId)}
-                      </Table.Header>
-                    ))}
+                    <Table.Header>Similarity</Table.Header>
+                    <Table.Header>{t('community.ranked_songs')}</Table.Header>
+                    <Table.Header>{t('community.ranking')}</Table.Header>
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                  {individualParticipants.map(({ participant, index }) => (
-                    <Table.Row key={`${participant.displayName}-${index}`}>
-                      <Table.Cell style={{ whiteSpace: 'nowrap' }}>
-                        {participant.displayName}
-                      </Table.Cell>
-                      {stats.songs.map((song) => (
-                        <Table.Cell key={song.songId} textAlign="center">
-                          {participant.ranks?.[song.songId] ?? '—'}
+                  {stats.participants.map((participant, index) => {
+                    const ranking = Object.entries(participant.ranks ?? {}).toSorted(
+                      ([, leftRank], [, rightRank]) => leftRank - rightRank
+                    );
+                    const isExpanded = expandedParticipants.has(index);
+                    const topRanking = ranking.slice(0, 5);
+                    const topSongIds = new Set(topRanking.map(([songId]) => songId));
+                    const bottomRanking = ranking
+                      .slice(-5)
+                      .filter(([songId]) => !topSongIds.has(songId));
+                    const canExpand = ranking.length > 10;
+
+                    return (
+                      <Table.Row key={`${participant.displayName}-${index}`}>
+                        <Table.Cell style={{ whiteSpace: 'nowrap' }}>
+                          {participant.displayName}
                         </Table.Cell>
-                      ))}
-                    </Table.Row>
-                  ))}
+                        <Table.Cell>{Math.round(participant.similarity)}%</Table.Cell>
+                        <Table.Cell>{participant.rankedSongCount}</Table.Cell>
+                        <Table.Cell>
+                          <Stack gap="1" minW="260px">
+                            {isExpanded ? (
+                              <RankingEntries entries={ranking} songName={songName} />
+                            ) : (
+                              <>
+                                <Text fontWeight="bold">{t('community.top_songs')}</Text>
+                                <RankingEntries entries={topRanking} songName={songName} />
+                                {bottomRanking.length > 0 && (
+                                  <>
+                                    <Text fontWeight="bold" mt="1">
+                                      {t('community.bottom_songs')}
+                                    </Text>
+                                    <RankingEntries entries={bottomRanking} songName={songName} />
+                                  </>
+                                )}
+                              </>
+                            )}
+                            {canExpand && (
+                              <Button
+                                alignSelf="start"
+                                size="xs"
+                                variant="outline"
+                                onClick={() => {
+                                  setExpandedParticipants((expanded) => {
+                                    const next = new Set(expanded);
+                                    if (next.has(index)) next.delete(index);
+                                    else next.add(index);
+                                    return next;
+                                  });
+                                }}
+                              >
+                                {isExpanded
+                                  ? t('community.show_fewer_songs')
+                                  : t('community.show_all_songs')}
+                              </Button>
+                            )}
+                          </Stack>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })}
                 </Table.Body>
               </Table.Root>
             </StatsSection>
@@ -258,6 +281,23 @@ function StatsSection({
       </Box>
     </Stack>
   );
+}
+
+function RankingEntries({
+  entries,
+  songName
+}: {
+  entries: [string, number][];
+  songName: (id: string) => string;
+}) {
+  return entries.map(([songId, rank]) => (
+    <HStack key={songId} gap="2">
+      <Text w="6" color="fg.muted">
+        {rank}.
+      </Text>
+      <Text>{songName(songId)}</Text>
+    </HStack>
+  ));
 }
 
 function ParticipantTable({ participants }: { participants: CommunityStats['participants'] }) {
