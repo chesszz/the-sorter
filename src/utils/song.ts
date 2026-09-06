@@ -1,6 +1,7 @@
 import { uniq } from 'lodash-es';
 import seriesInfo from '../../data/series-info.json';
 import type { HasuSong, Song } from '~/types/songs';
+import { token } from 'styled-system/tokens';
 
 export const getHasuSongColor = (song: HasuSong) => {
   switch (song.unit) {
@@ -17,6 +18,6 @@ export const getHasuSongColor = (song: HasuSong) => {
 
 export const getSongColor = (song: Song) => {
   const series = uniq(song.seriesIds);
-  if (series.length > 1) return '#e4007f';
-  return seriesInfo.find((s) => s.id === series[0] + '')?.color ?? '#e4007f';
+  if (series.length > 1) return token('colors.phantom.default');
+  return seriesInfo.find((s) => s.id === series[0] + '')?.color ?? token('colors.phantom.default');
 };
