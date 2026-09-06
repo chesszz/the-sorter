@@ -253,29 +253,17 @@ export function Page() {
                         <Table.Cell>
                           <Stack gap="1" minW="260px">
                             {isExpanded ? (
-                              <RankingEntries
-                                entries={ranking}
-                                songName={songName}
-                                thumbnails={thumbnails}
-                              />
+                              <RankingEntries entries={ranking} songName={songName} />
                             ) : (
                               <>
                                 <Text fontWeight="bold">{t('community.top_songs')}</Text>
-                                <RankingEntries
-                                  entries={topRanking}
-                                  songName={songName}
-                                  thumbnails={thumbnails}
-                                />
+                                <RankingEntries entries={topRanking} songName={songName} />
                                 {bottomRanking.length > 0 && (
                                   <>
                                     <Text mt="1" fontWeight="bold">
                                       {t('community.bottom_songs')}
                                     </Text>
-                                    <RankingEntries
-                                      entries={bottomRanking}
-                                      songName={songName}
-                                      thumbnails={thumbnails}
-                                    />
+                                    <RankingEntries entries={bottomRanking} songName={songName} />
                                   </>
                                 )}
                               </>
@@ -338,19 +326,17 @@ function StatsSection({
 
 function RankingEntries({
   entries,
-  songName,
-  thumbnails
+  songName
 }: {
   entries: [string, number][];
   songName: (id: string) => string;
-  thumbnails: Map<string, string | undefined>;
 }) {
   return (
     <HStack gap="3" alignItems="start" flexWrap="wrap">
       {entries.map(([songId, rank]) => (
         <HStack key={songId} gap="2">
           <Text color="fg.muted">{rank}.</Text>
-          <SongLabel name={songName(songId)} thumbnail={thumbnails.get(songId)} />
+          <Text>{songName(songId)}</Text>
         </HStack>
       ))}
     </HStack>
