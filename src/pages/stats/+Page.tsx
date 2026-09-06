@@ -140,10 +140,10 @@ export function Page() {
                       ([, leftRank], [, rightRank]) => leftRank - rightRank
                     );
                     const isExpanded = expandedParticipants.has(index);
-                    const topRanking = ranking.slice(0, 5);
+                    const topRanking = ranking.slice(0, 3);
                     const topSongIds = new Set(topRanking.map(([songId]) => songId));
                     const bottomRanking = ranking
-                      .slice(-5)
+                      .slice(-3)
                       .filter(([songId]) => !topSongIds.has(songId));
                     const canExpand = ranking.length > 10;
 
@@ -164,7 +164,7 @@ export function Page() {
                                 <RankingEntries entries={topRanking} songName={songName} />
                                 {bottomRanking.length > 0 && (
                                   <>
-                                    <Text fontWeight="bold" mt="1">
+                                    <Text mt="1" fontWeight="bold">
                                       {t('community.bottom_songs')}
                                     </Text>
                                     <RankingEntries entries={bottomRanking} songName={songName} />
@@ -174,7 +174,6 @@ export function Page() {
                             )}
                             {canExpand && (
                               <Button
-                                alignSelf="start"
                                 size="xs"
                                 variant="outline"
                                 onClick={() => {
@@ -185,6 +184,7 @@ export function Page() {
                                     return next;
                                   });
                                 }}
+                                alignSelf="start"
                               >
                                 {isExpanded
                                   ? t('community.show_fewer_songs')
@@ -290,14 +290,16 @@ function RankingEntries({
   entries: [string, number][];
   songName: (id: string) => string;
 }) {
-  return entries.map(([songId, rank]) => (
-    <HStack key={songId} gap="2">
-      <Text w="6" color="fg.muted">
-        {rank}.
-      </Text>
-      <Text>{songName(songId)}</Text>
+  return (
+    <HStack gap="3" alignItems="start" flexWrap="wrap">
+      {entries.map(([songId, rank]) => (
+        <HStack key={songId} gap="2">
+          <Text color="fg.muted">{rank}.</Text>
+          <Text>{songName(songId)}</Text>
+        </HStack>
+      ))}
     </HStack>
-  ));
+  );
 }
 
 function ParticipantTable({ participants }: { participants: CommunityStats['participants'] }) {
