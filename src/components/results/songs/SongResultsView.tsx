@@ -133,7 +133,9 @@ export function SongResultsView({
           quality: 1,
           scale: 1,
           type: 'image/png',
-          features: { removeControlCharacter: false }
+          drawImageInterval: 0,
+          font: false,
+          features: { removeControlCharacter: false, fixSvgXmlDecode: false }
         });
         screenshotCache.current = { key: cacheKey, blob };
         return blob;
@@ -423,7 +425,7 @@ export function SongResultsView({
                 .filter((column) => column.length > 0)
                 .map((column, index) => (
                   <Box key={index} flex="1" minW="0">
-                    <SongRankingTable songs={column} />
+                    <SongRankingTable songs={column} eagerImages />
                   </Box>
                 ))}
             </HStack>

@@ -13,12 +13,14 @@ export function SongRankingTable({
   songs,
   onSelectSong,
   guessResults,
-  maxAttempts
+  maxAttempts,
+  eagerImages = false
 }: {
   songs: WithRank<Song>[];
   onSelectSong?: (character: WithRank<Song>) => void;
   guessResults?: Record<string, GuessResult>;
   maxAttempts?: number;
+  eagerImages?: boolean;
 }) {
   const { t, i18n } = useTranslation();
 
@@ -62,7 +64,7 @@ export function SongRankingTable({
                   <img
                     src={getAssetUrl(thumbnail)}
                     alt={getSongName(name, englishName, lang)}
-                    loading="lazy"
+                    loading={eagerImages ? 'eager' : 'lazy'}
                     style={{ width: '96px', height: '96px', objectFit: 'cover', margin: 'auto' }}
                   />
                 )}
