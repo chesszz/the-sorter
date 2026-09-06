@@ -2,7 +2,6 @@ import type { WithRank } from '~/types';
 import type { Song } from '~/types/songs';
 import { getAssetUrl } from '~/utils/assets';
 import { getSongName } from '~/utils/names';
-import { getSongColor } from '~/utils/song';
 
 const WIDTH = 1280;
 const PADDING = 16;
@@ -165,8 +164,7 @@ export async function renderSongRankingScreenshot(options: ScreenshotOptions): P
 
     column.forEach((song, rowIndex) => {
       const rowY = tableTop + HEADER_HEIGHT + rowIndex * ROW_HEIGHT;
-      const songColor = getSongColor(song);
-      context.fillStyle = songColor;
+      context.fillStyle = PHANTOM_RED;
       context.fillRect(x, rowY, 8, ROW_HEIGHT);
       context.strokeStyle = PHANTOM_RED;
       context.beginPath();
@@ -179,7 +177,7 @@ export async function renderSongRankingScreenshot(options: ScreenshotOptions): P
       context.textAlign = 'left';
       context.fillText(`${song.rank}`, x + 20, rowY + ROW_HEIGHT / 2);
 
-      context.fillStyle = songColor;
+      context.fillStyle = PHANTOM_RED;
       context.font = 'bold 17px sans-serif';
       const songName = getSongName(song.name, song.englishName, options.locale);
       context.fillText(
