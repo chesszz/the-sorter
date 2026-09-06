@@ -30,6 +30,6 @@ The frontend submits through a hidden HTML form and reads stats through a JSONP 
 
 ## What the script stores
 
-Each submission is one row containing the display name, song-list version, ordered song IDs, timestamps, and hashes of the edit token and browser ID. The raw edit token is returned only to the submitting browser. The stats endpoint returns aggregates and participant similarity scores, never edit tokens.
+Each submission is one row containing the display name, ordered song IDs, timestamps, and hashes of the edit token and browser ID. The raw edit token is returned only to the submitting browser. The stats endpoint returns aggregates and participant similarity scores, never edit tokens.
 
-The current ranking namespace is `phantom-siita-v1`. A submission may contain any two or more songs. If songs are added, append their IDs to `CONFIG.songIds`; existing rows remain valid because missing songs are ignored in pairwise statistics. Users do not need to redo old rankings. Updating a submission replaces that user’s previous ranking with the newly submitted set of songs.
+A submission may contain any two or more songs. If songs are added, append their IDs to `CONFIG.songIds`; existing rows remain valid because missing songs are ignored in pairwise statistics. Users do not need to redo old rankings. Updating a submission replaces that user’s previous ranking with the newly submitted set of songs.
