@@ -82,7 +82,7 @@ function saveSubmission_(body) {
     const browserHash = hash_(browserId);
     const tokenHash = editToken ? hash_(editToken) : '';
 
-    if (submissionId && tokenHash) {
+    if (submissionId && rows.some((row) => row.submission_id === submissionId)) {
       const existing = rows.find(
         (row) => row.submission_id === submissionId && row.edit_token_hash === tokenHash
       );
@@ -375,7 +375,12 @@ function json_(value, callback) {
 }
 
 function postMessage_(value) {
-  const body = JSON.stringify(value).replace(/</g, '\\u003c');
+  const body = JSON.stringify({
+    type: 'community-ranking-response',
+    requestId: value.requestId,
+    ok: value.ok,
+    message: value.message
+  }).replace(/</g, '\\u003c');
   const output = HtmlService.createHtmlOutput(
     `<!doctype html><script>window.top.postMessage(${body}, '*');</script>`
   );
