@@ -108,7 +108,11 @@ export function Page() {
         )}
         {stats && (
           <Stack gap="8" w="full">
-            <StatsSection title={t('community.consensus')} w={{ base: 'full', md: '75%' }}>
+            <StatsSection
+              title={t('community.consensus')}
+              alignSelf="center"
+              w={{ base: 'full', md: '75%' }}
+            >
               <Table.Root size="sm">
                 <Table.Head>
                   <Table.Row>
@@ -256,18 +260,23 @@ export function Page() {
                             {isExpanded ? (
                               <RankingEntries entries={ranking} songName={songName} />
                             ) : (
-                              <HStack gap="6" alignItems="start" flexWrap="wrap">
-                                <Stack gap="1">
+                              <Box
+                                display="grid"
+                                gap="6"
+                                gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+                                w="full"
+                              >
+                                <Stack gap="1" minW="0">
                                   <Text fontWeight="bold">{t('community.top_songs')}</Text>
                                   <RankingEntries entries={topRanking} songName={songName} />
                                 </Stack>
                                 {bottomRanking.length > 0 && (
-                                  <Stack gap="1">
+                                  <Stack gap="1" minW="0">
                                     <Text fontWeight="bold">{t('community.bottom_songs')}</Text>
                                     <RankingEntries entries={bottomRanking} songName={songName} />
                                   </Stack>
                                 )}
-                              </HStack>
+                              </Box>
                             )}
                             {canExpand && (
                               <Button
