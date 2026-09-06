@@ -23,20 +23,27 @@ export const getArtistName = (artist: string, locale: Locale | undefined) => {
   return artist;
 };
 
-export const isEnglishLocale = (locale: Locale | undefined) =>
-  locale?.toLowerCase().split('-')[0] === 'en';
+const getLanguage = (locale: Locale | undefined) => locale?.toLowerCase().split(/[-_]/)[0];
 
-export const isJapaneseLocale = (locale: Locale | undefined) =>
-  locale?.toLowerCase().split('-')[0] === 'ja';
+export const isEnglishLocale = (locale: Locale | undefined) => getLanguage(locale) === 'en';
+
+export const isJapaneseLocale = (locale: Locale | undefined) => getLanguage(locale) === 'ja';
 
 export const getSongName = (
   name: string,
   englishName: string | undefined,
   locale: Locale | undefined
 ): string => {
-  const language = locale?.toLowerCase().split('-')[0];
-  if (language && !isJapaneseLocale(locale) && englishName) return englishName;
-  return name;
+  return isJapaneseLocale(locale) ? name : (englishName ?? name);
+};
+
+export const getSongSecondaryName = (
+  name: string,
+  englishName: string | undefined,
+  locale: Locale | undefined
+): string | undefined => {
+  if (!englishName) return undefined;
+  return isJapaneseLocale(locale) ? englishName : name;
 };
 
 export function getFullPerformanceName(perf: {

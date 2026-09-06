@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import artistsData from '../../../../data/artists-info.json';
-import { getArtistName, getSongName, isJapaneseLocale } from '~/utils/names';
+import { getArtistName, getSongName, getSongSecondaryName } from '~/utils/names';
 import {
   Root as DialogRoot,
   Backdrop as DialogBackdrop,
@@ -136,7 +136,7 @@ export function EditItemDialog({ open, onOpenChange, item, onSave }: EditItemDia
     return {
       id: song.id,
       displayName: getSongName(song.name, song.englishName, lang),
-      japaneseName: !isJapaneseLocale(lang) && song.englishName ? song.name : undefined,
+      secondaryName: getSongSecondaryName(song.name, song.englishName, lang),
       artist: artist ? getArtistName(artist.name, lang) : undefined,
       color: getSongColor(song)
     };
@@ -233,9 +233,9 @@ export function EditItemDialog({ open, onOpenChange, item, onSave }: EditItemDia
                           <Text fontSize="sm" fontWeight="bold">
                             {stagedSong.displayName}
                           </Text>
-                          {stagedSong.japaneseName && (
+                          {stagedSong.secondaryName && (
                             <Text color="fg.muted" fontSize="xs">
-                              {stagedSong.japaneseName}
+                              {stagedSong.secondaryName}
                             </Text>
                           )}
                           {stagedSong.artist && (
@@ -304,9 +304,9 @@ export function EditItemDialog({ open, onOpenChange, item, onSave }: EditItemDia
                                     <Text fontSize="sm" fontWeight="medium">
                                       {getSongName(song.name, song.englishName, lang)}
                                     </Text>
-                                    {!isJapaneseLocale(lang) && song.englishName && (
+                                    {getSongSecondaryName(song.name, song.englishName, lang) && (
                                       <Text color="fg.muted" fontSize="xs">
-                                        {song.name}
+                                        {getSongSecondaryName(song.name, song.englishName, lang)}
                                       </Text>
                                     )}
                                     {song.artist && (

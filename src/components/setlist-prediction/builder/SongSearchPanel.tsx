@@ -8,7 +8,7 @@ import { useState, memo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { MdArrowForward, MdDragIndicator } from 'react-icons/md';
 
-import { getSongName, isJapaneseLocale } from '~/utils/names';
+import { getSongName, getSongSecondaryName } from '~/utils/names';
 import { css } from 'styled-system/css';
 import { Box, Stack, HStack } from 'styled-system/jsx';
 import { Input } from '~/components/ui/styled/input';
@@ -80,9 +80,9 @@ const DraggableSongItem = memo(function DraggableSongItem({
           <Text fontSize="sm" fontWeight="medium">
             {getSongName(song.name, song.englishName, lang)}
           </Text>
-          {!isJapaneseLocale(lang) && song.englishName && (
+          {getSongSecondaryName(song.name, song.englishName, lang) && (
             <Text color="fg.muted" fontSize="xs">
-              {song.name}
+              {getSongSecondaryName(song.name, song.englishName, lang)}
             </Text>
           )}
           {song.artist && (

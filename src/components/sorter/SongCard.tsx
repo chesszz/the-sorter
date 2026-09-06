@@ -6,7 +6,7 @@ import { Center, Box, HStack, Stack } from 'styled-system/jsx';
 import { token } from 'styled-system/tokens';
 import type { Artist, Song } from '~/types/songs';
 import { getSongColor } from '~/utils/song';
-import { getArtistName, getSongName, isJapaneseLocale } from '~/utils/names';
+import { getArtistName, getSongName, getSongSecondaryName } from '~/utils/names';
 import { getAssetUrl } from '~/utils/assets';
 import { useArtistsData } from '~/hooks/useArtistsData';
 import { Heardle } from './Heardle';
@@ -121,6 +121,7 @@ export function SongCard({
   // Determine if we should show Heardle or revealed content
   const showHeardle = heardleMode && !isRevealed && songInventory && onGuess && onPass && onNoAudio;
   const showInfo = !heardleMode || isRevealed;
+  const secondarySongName = getSongSecondaryName(song.name, song.englishName, lang);
 
   return (
     <Stack
@@ -225,9 +226,9 @@ export function SongCard({
             </a>
           )}
         </HStack>
-        {showInfo && !isJapaneseLocale(lang) && song.englishName && (
+        {showInfo && secondarySongName && (
           <Text color="fg.muted" fontSize="xs">
-            {song.name}
+            {secondarySongName}
           </Text>
         )}
         <Text fontSize="sm" textAlign="center">
