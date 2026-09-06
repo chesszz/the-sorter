@@ -6,8 +6,9 @@ on:
       - main
   workflow_dispatch:
   workflow_run:
-    workflows: ["Update Data"]
+    workflows: ['Update Data']
     types: [completed]
+
 jobs:
   # Build job
   build:
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Dependencies
         uses: ./.github/composite-actions/setup
       - name: Build
