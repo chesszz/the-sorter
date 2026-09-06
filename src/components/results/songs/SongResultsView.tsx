@@ -115,6 +115,7 @@ export function SongResultsView({
       description ?? '',
       currentTab,
       _i18n.language,
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light',
       songs.map((song) => song.id).join(','),
       order?.map((group) => group.join(',')).join('|') ?? '',
       failedSongs?.map((song) => song.id).join(',') ?? ''
