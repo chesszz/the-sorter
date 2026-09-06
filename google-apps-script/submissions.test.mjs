@@ -162,4 +162,22 @@ assert.equal(submit({ ...payload, action: 'delete' }).ok, true, 'retry deletion 
 assert.equal(submit(payload).ok, true, 'can submit again after deletion');
 const stats = context.getStats_(['14', '9', '4']);
 assert.deepEqual(JSON.parse(JSON.stringify(stats.participants[0].ranks)), { 14: 1, 9: 2, 4: 3 });
+assert.equal(
+  context.weightedKendallSimilarity_({ ranks: { 14: 1, 9: 2, 4: 3 } }, ['14', '9', '4'], {
+    14: 1,
+    9: 2,
+    4: 3
+  }),
+  100,
+  'matching rankings must have full similarity'
+);
+assert.equal(
+  context.weightedKendallSimilarity_({ ranks: { 14: 3, 9: 2, 4: 1 } }, ['14', '9', '4'], {
+    14: 1,
+    9: 2,
+    4: 3
+  }),
+  0,
+  'reversed rankings must have zero similarity'
+);
 console.log('Passed: submit, update, errors, authenticated deletion, retry and resubmit.');

@@ -343,16 +343,17 @@ function getStats_(requestedSongIds) {
 
   const consensus = {};
   songs.forEach((song) => (consensus[song.songId] = song.sentiment / 100));
+  const consensusRanks = buildConsensusRanks_(songs);
   const participantStats = participants.map((participant) => {
     const ids = songIds.filter((id) => participant.scores[id] !== undefined);
-    const distance = ids.length
+    const scoreDistance = ids.length
       ? ids.reduce((sum, id) => sum + Math.abs(participant.scores[id] - consensus[id]), 0) /
         ids.length
       : 1;
     return {
       displayName: participant.name,
-      similarity: similarityFromDistance_(distance),
-      distance: round_(distance),
+      similarity: weightedKendallSimilarity_(participant, ids, consensusRanks),
+      distance: round_(scoreDistance),
       rankedSongCount: ids.length,
       ranks: participant.ranks
     };
@@ -489,9 +490,43 @@ function roundOneDecimal_(value) {
   return Math.round(value * 10) / 10;
 }
 
-function similarityFromDistance_(distance) {
-  const closeness = Math.max(0, 1 - distance);
-  return round_(closeness * closeness * 100);
+function buildConsensusRanks_(songs) {
+  const ordered = songs.slice().sort((left, right) => right.sentiment - left.sentiment);
+  const ranks = {};
+  let position = 0;
+  let currentRank = 0;
+  let previousSentiment;
+  ordered.forEach((song) => {
+    position += 1;
+    if (song.sentiment !== previousSentiment) currentRank = position;
+    ranks[song.songId] = currentRank;
+    previousSentiment = song.sentiment;
+  });
+  return ranks;
+}
+
+function compareRankOrder_(leftRank, rightRank) {
+  if (leftRank < rightRank) return 1;
+  if (leftRank > rightRank) return -1;
+  return 0;
+}
+
+function weightedKendallSimilarity_(participant, ids, consensusRanks) {
+  let agreementWeight = 0;
+  let totalWeight = 0;
+  for (let left = 0; left < ids.length; left += 1) {
+    for (let right = left + 1; right < ids.length; right += 1) {
+      const leftId = ids[left];
+      const rightId = ids[right];
+      const userOrder = compareRankOrder_(participant.ranks[leftId], participant.ranks[rightId]);
+      const consensusOrder = compareRankOrder_(consensusRanks[leftId], consensusRanks[rightId]);
+      const weight = 1 + Math.abs(consensusRanks[leftId] - consensusRanks[rightId]);
+      totalWeight += weight;
+      if (userOrder === consensusOrder) agreementWeight += weight;
+      else if (userOrder === 0 || consensusOrder === 0) agreementWeight += weight / 2;
+    }
+  }
+  return totalWeight ? round_((agreementWeight / totalWeight) * 100) : 50;
 }
 
 function json_(value, callback) {
