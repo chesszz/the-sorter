@@ -397,28 +397,55 @@ function MatchupTable({
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {matchups.map((matchup) => (
-          <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
-            <Table.Cell>
-              <SongLabel
-                name={songName(matchup.leftSongId)}
-                thumbnail={thumbnails.get(matchup.leftSongId)}
-              />
-            </Table.Cell>
-            <Table.Cell>
-              <SongLabel
-                name={songName(matchup.rightSongId)}
-                thumbnail={thumbnails.get(matchup.rightSongId)}
-              />
-            </Table.Cell>
-            <Table.Cell>
-              {matchup.leftWins}–{matchup.rightWins}
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        {matchups.map((matchup) => {
+          const orderedMatchup = winnerFirstMatchup(matchup);
+          return (
+            <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
+              <Table.Cell>
+                <SongLabel
+                  name={songName(orderedMatchup.leftSongId)}
+                  thumbnail={thumbnails.get(orderedMatchup.leftSongId)}
+                />
+              </Table.Cell>
+              <Table.Cell>
+                <SongLabel
+                  name={songName(orderedMatchup.rightSongId)}
+                  thumbnail={thumbnails.get(orderedMatchup.rightSongId)}
+                />
+              </Table.Cell>
+              <Table.Cell>
+                {orderedMatchup.leftWins}–{orderedMatchup.rightWins}
+              </Table.Cell>
+            </Table.Row>
+          );
+        })}
       </Table.Body>
     </Table.Root>
   );
+}
+
+function winnerFirstMatchup(matchup: CommunityStats['matchups'][number]) {
+  const isTie = matchup.leftWins === matchup.rightWins;
+  const rightWinsFirst = matchup.rightWins > matchup.leftWins;
+  const rightIdFirstOnTie = isTie && compareSongIds(matchup.rightSongId, matchup.leftSongId) < 0;
+  if (!rightWinsFirst && !rightIdFirstOnTie) return matchup;
+
+  return {
+    ...matchup,
+    leftSongId: matchup.rightSongId,
+    rightSongId: matchup.leftSongId,
+    leftWins: matchup.rightWins,
+    rightWins: matchup.leftWins
+  };
+}
+
+function compareSongIds(leftId: string, rightId: string) {
+  const leftNumber = Number(leftId);
+  const rightNumber = Number(rightId);
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) {
+    return leftNumber - rightNumber;
+  }
+  return leftId.localeCompare(rightId);
 }
 
 function CorrelationTable({
