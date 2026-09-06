@@ -468,14 +468,14 @@ export function Page() {
             <Button
               size="lg"
               variant="solid"
-              fontWeight="bold"
-              minW="200px"
               onClick={() => handleStart()}
               disabled={listCount < 2}
+              minW="200px"
+              fontWeight="bold"
             >
               {t('sort.start')}
             </Button>
-            <Stack alignItems="center" w="full" gap="2" opacity={0.78}>
+            <Stack gap="2" alignItems="center" w="full" opacity={0.78}>
               <Text color="fg.muted" fontSize="sm" textAlign="center">
                 {t('settings.filters_optional')}
               </Text>
