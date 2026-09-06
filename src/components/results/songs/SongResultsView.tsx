@@ -26,6 +26,7 @@ import type { GuessResult } from '~/hooks/useHeardleState';
 import type { PerformanceSortMeta } from '~/types/performance-sort';
 import { PerformanceOrderView } from './PerformanceOrderView';
 import { getFullPerformanceName } from '~/utils/names';
+import { addScreenshotFooter } from '~/utils/screenshot-footer';
 import { CommunityRankingSubmission } from '~/components/community/CommunityRankingSubmission';
 
 export function SongResultsView({
@@ -125,21 +126,29 @@ export function SongResultsView({
     setShowRenderingCanvas(true);
     toast?.({ description: t('toast.generating_screenshot') });
     try {
-      setTimestamp(new Date());
-      const domToBlobPromise = import('modern-screenshot').then((module) => module.domToBlob);
+      const generatedAt = new Date();
+      setTimestamp(generatedAt);
+      const capturePromise = import('modern-screenshot').then((module) => module.domToCanvas);
       await new Promise<void>((resolve) => {
         requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
       });
-      const domToBlob = await domToBlobPromise;
+      const domToCanvas = await capturePromise;
       const resultsBox = document.getElementById('results');
       if (resultsBox) {
-        const blob = await domToBlob(resultsBox, {
+        const canvas = await domToCanvas(resultsBox, {
           quality: 1,
           scale: 1,
           type: 'image/png',
           drawImageInterval: 0,
           font: false,
           features: { removeControlCharacter: false, fixSvgXmlDecode: true }
+        });
+        const style = getComputedStyle(resultsBox);
+        const blob = await addScreenshotFooter(canvas, {
+          attribution: t('results.generated_by'),
+          timestamp: `${t('results.generated_at')}: ${generatedAt.toLocaleString()}`,
+          background: style.backgroundColor,
+          color: style.color
         });
         screenshotCache.current = { key: cacheKey, blob };
         return blob;
@@ -433,21 +442,6 @@ export function SongResultsView({
                   </Box>
                 ))}
             </HStack>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                fontSize: '14px',
-                lineHeight: '1.5'
-              }}
-            >
-              <span>{t('results.generated_by')}</span>
-              <span style={{ textAlign: 'right' }}>
-                {t('results.generated_at')}: {timestamp.toLocaleString()}
-              </span>
-            </div>
           </Stack>
         </Box>
       )}
