@@ -71,12 +71,13 @@ export function Page() {
   const correlations = [...(stats?.correlations ?? [])]
     .toSorted((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation))
     .slice(0, 10);
+  const participantLimit = Math.min(10, Math.floor((stats?.participants.length ?? 0) / 2));
   const mainstream = [...(stats?.participants ?? [])]
     .toSorted((a, b) => b.similarity - a.similarity)
-    .slice(0, 10);
+    .slice(0, participantLimit);
   const contrarian = [...(stats?.participants ?? [])]
     .toSorted((a, b) => a.similarity - b.similarity)
-    .slice(0, 10);
+    .slice(0, participantLimit);
   const individualParticipants = [...(stats?.participants ?? [])].toSorted(
     (a, b) => b.similarity - a.similarity
   );
