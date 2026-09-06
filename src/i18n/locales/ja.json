@@ -27,7 +27,7 @@
     "updated": "ランキングを更新しました。",
     "submit_error": "ランキングを送信できませんでした。",
     "full_list_required": "コミュニティランキングに送信するには、全楽曲を選択してください。",
-    "complete_ranking": "送信する前にランキングを完成させてください。",
+    "complete_ranking": "2曲以上を選択し、ソートを完了してから送信してください。",
     "keep_edit_link": "後で更新するには編集リンクを保存してください。",
     "copy_edit_link": "編集リンクをコピー",
     "edit_link_copied": "編集リンクをコピーしました。",

@@ -10,7 +10,6 @@ import {
   getRankingFromOrder,
   deleteCommunityRanking,
   getSavedCommunitySubmission,
-  COMMUNITY_RANKING_SONG_IDS,
   isCommunityRankingsConfigured,
   saveCommunitySubmission,
   submitCommunityRanking,
@@ -38,8 +37,8 @@ export function CommunityRankingSubmission({
   }, []);
 
   const ranking = useMemo(() => (order ? getRankingFromOrder(order, songs) : []), [order, songs]);
-  const isFullCommunityList = songs.length === COMMUNITY_RANKING_SONG_IDS.length;
-  const isComplete = isFullCommunityList && ranking.length === COMMUNITY_RANKING_SONG_IDS.length;
+  const isComplete =
+    ranking.length >= 2 && new Set(ranking.map((entry) => entry.songId)).size === ranking.length;
 
   if (!isCommunityRankingsConfigured) return null;
 
@@ -114,12 +113,7 @@ export function CommunityRankingSubmission({
             {saved ? t('community.update') : t('community.submit')}
           </Button>
         </HStack>
-        {!isFullCommunityList && (
-          <Text color="fg.muted" fontSize="sm">
-            {t('community.full_list_required')}
-          </Text>
-        )}
-        {isFullCommunityList && !isComplete && (
+        {!isComplete && (
           <Text color="fg.muted" fontSize="sm">
             {t('community.complete_ranking')}
           </Text>
