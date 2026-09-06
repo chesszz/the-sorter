@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaChevronDown, FaCopy, FaDownload, FaShare } from 'react-icons/fa6';
 
 import { useTranslation } from 'react-i18next';
@@ -59,6 +59,7 @@ export function SongResultsView({
   const [timestamp, setTimestamp] = useState(new Date());
   const [showRenderingCanvas, setShowRenderingCanvas] = useState(false);
   const [isGeneratingScreenshot, setIsGeneratingScreenshot] = useState(false);
+  const screenshotCache = useRef<{ key: string; blob: Blob } | undefined>(undefined);
   const { t, i18n: _i18n } = useTranslation();
 
   const effectiveTitlePrefix = performanceMeta
@@ -109,6 +110,16 @@ export function SongResultsView({
   }, [order, songsData, failedSongIds]);
 
   const makeScreenshot = async () => {
+    const cacheKey = [
+      title,
+      description ?? '',
+      currentTab,
+      songs.map((song) => song.id).join(','),
+      order?.map((group) => group.join(',')).join('|') ?? '',
+      failedSongs?.map((song) => song.id).join(',') ?? ''
+    ].join('\u0000');
+    if (screenshotCache.current?.key === cacheKey) return screenshotCache.current.blob;
+
     setIsGeneratingScreenshot(true);
     setShowRenderingCanvas(true);
     toast?.({ description: t('toast.generating_screenshot') });
@@ -117,12 +128,14 @@ export function SongResultsView({
       const resultsBox = document.getElementById('results');
       setTimestamp(new Date());
       if (resultsBox) {
-        return await domToBlob(resultsBox, {
+        const blob = await domToBlob(resultsBox, {
           quality: 1,
           scale: 1,
           type: 'image/png',
           features: { removeControlCharacter: false }
         });
+        screenshotCache.current = { key: cacheKey, blob };
+        return blob;
       }
     } finally {
       setShowRenderingCanvas(false);
