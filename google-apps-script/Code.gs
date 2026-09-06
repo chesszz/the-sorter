@@ -346,7 +346,8 @@ function json_(value, callback) {
 
 function postMessage_(value) {
   const body = JSON.stringify(value).replace(/</g, '\\u003c');
-  return HtmlService.createHtmlOutput(
+  const output = HtmlService.createHtmlOutput(
     `<!doctype html><script>window.parent.postMessage(${body}, '*');</script>`
   );
+  return output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
