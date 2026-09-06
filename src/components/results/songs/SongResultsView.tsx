@@ -358,11 +358,18 @@ export function SongResultsView({
               </Heading>
             )}
             {description && <Text>{description}</Text>}
-            {currentTab === 'table' ? (
-              <SongRankingTable songs={songs} />
-            ) : (
-              <SongRankingTable songs={songs} />
-            )}
+            <HStack gap="6" alignItems="flex-start" width="full">
+              {[
+                songs.slice(0, Math.ceil(songs.length / 2)),
+                songs.slice(Math.ceil(songs.length / 2))
+              ]
+                .filter((column) => column.length > 0)
+                .map((column, index) => (
+                  <Box key={index} flex="1" minW="0">
+                    <SongRankingTable songs={column} />
+                  </Box>
+                ))}
+            </HStack>
             <Text textAlign="end">
               {t('results.generated_at')}: {timestamp.toLocaleString()}
             </Text>
