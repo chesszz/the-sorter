@@ -61,6 +61,7 @@
   "settings": {
     "sort_count": "{{ count }} to be sorted",
     "song_sort_count": "{{ count }} songs to be sorted",
+    "filters_optional": "Filters are optional — start with all songs or choose a selection.",
     "seiyuu": "Do you like seiyuu? (Seiyuu Mode)",
     "share": "Share current settings",
     "series": "Series",

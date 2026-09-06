@@ -59,6 +59,7 @@
   "settings": {
     "sort_count": "{{ count }}人をランキングする",
     "song_sort_count": "{{ count }}曲をランキングする",
+    "filters_optional": "絞り込みは任意です。全楽曲のまま開始するか、選択してください。",
     "seiyuu": "声優が好きか？（声優モード）",
     "share": "設定を共有する",
     "series": "シリーズ",

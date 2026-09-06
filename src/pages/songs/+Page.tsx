@@ -465,13 +465,28 @@ export function Page() {
         <Text textAlign="center">{t('description')}</Text>
         {!isSorting && (
           <>
-            <Suspense fallback={<LoadingCharacterFilters />}>
-              {import.meta.env.SSR ? (
-                <LoadingCharacterFilters />
-              ) : (
-                <SongFilters filters={songFilters} setFilters={setSongFilters} />
-              )}
-            </Suspense>
+            <Button
+              size="lg"
+              variant="solid"
+              fontWeight="bold"
+              minW="200px"
+              onClick={() => handleStart()}
+              disabled={listCount < 2}
+            >
+              {t('sort.start')}
+            </Button>
+            <Stack alignItems="center" w="full" gap="2" opacity={0.78}>
+              <Text color="fg.muted" fontSize="sm" textAlign="center">
+                {t('settings.filters_optional')}
+              </Text>
+              <Suspense fallback={<LoadingCharacterFilters />}>
+                {import.meta.env.SSR ? (
+                  <LoadingCharacterFilters />
+                ) : (
+                  <SongFilters filters={songFilters} setFilters={setSongFilters} />
+                )}
+              </Suspense>
+            </Stack>
             <Wrap>
               <Switch
                 checked={noTieMode}
@@ -500,13 +515,11 @@ export function Page() {
           <Button onClick={() => void shareUrl()} variant="subtle">
             <FaShare /> {t('settings.share')}
           </Button>
-          <Button
-            variant="solid"
-            onClick={() => handleStart()}
-            disabled={!isSorting && listCount < 2}
-          >
-            {!isSorting ? t('sort.start') : t('sort.start_over')}
-          </Button>
+          {isSorting && (
+            <Button size="lg" variant="solid" onClick={() => handleStart()}>
+              {t('sort.start_over')}
+            </Button>
+          )}
           {isSorting && (
             <Button variant="subtle" onClick={() => handleClear()}>
               {state?.status !== 'end' ? t('sort.stop') : t('sort.new_settings')}
