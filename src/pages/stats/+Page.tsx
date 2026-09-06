@@ -72,6 +72,9 @@ export function Page() {
   const contrarian = [...(stats?.participants ?? [])]
     .toSorted((a, b) => a.similarity - b.similarity)
     .slice(0, 10);
+  const individualParticipants = [...(stats?.participants ?? [])].toSorted(
+    (a, b) => b.similarity - a.similarity
+  );
   return (
     <>
       <Metadata title={t('community.stats_title')} helmet />
@@ -135,7 +138,7 @@ export function Page() {
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                  {stats.participants.map((participant, index) => {
+                  {individualParticipants.map((participant, index) => {
                     const ranking = Object.entries(participant.ranks ?? {}).toSorted(
                       ([, leftRank], [, rightRank]) => leftRank - rightRank
                     );
