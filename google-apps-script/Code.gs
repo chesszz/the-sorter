@@ -94,9 +94,10 @@ function saveSubmission_(body) {
             row.browser_id_hash === browserHash
         );
         if (sameBrowser) {
+          const existingRanking = parseRanking_(sameBrowser.ranking_json);
           updateRow_(sheet, sameBrowser.rowNumber, {
             display_name: displayName,
-            ranking_json: JSON.stringify(ranking),
+            ranking_json: JSON.stringify(mergeRankings_(existingRanking, ranking)),
             updated_at: new Date()
           });
           sheet.getRange(sameBrowser.rowNumber, 4).setValue(tokenHash);
@@ -104,10 +105,11 @@ function saveSubmission_(body) {
         }
         throw new Error('That edit link is invalid or expired.');
       }
+      const existingRanking = parseRanking_(existing.ranking_json);
       updateRow_(sheet, existing.rowNumber, {
         version,
         display_name: displayName,
-        ranking_json: JSON.stringify(ranking),
+        ranking_json: JSON.stringify(mergeRankings_(existingRanking, ranking)),
         updated_at: new Date()
       });
       return { ok: true, submissionId, editToken };
@@ -144,8 +146,8 @@ function saveSubmission_(body) {
 function validateRanking_(ranking, version) {
   if (version !== CONFIG.defaultVersion)
     throw new Error('This song list version is not supported.');
-  if (!Array.isArray(ranking) || ranking.length !== CONFIG.songIds.length) {
-    throw new Error('A complete ranking is required.');
+  if (!Array.isArray(ranking) || ranking.length < 2 || ranking.length > CONFIG.songIds.length) {
+    throw new Error('Rank at least two songs.');
   }
   const validIds = {};
   CONFIG.songIds.forEach((id) => (validIds[id] = true));
@@ -161,32 +163,48 @@ function validateRanking_(ranking, version) {
   });
 }
 
+function parseRanking_(rankingJson) {
+  try {
+    const ranking = JSON.parse(rankingJson);
+    return Array.isArray(ranking) ? ranking : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function mergeRankings_(existingRanking, newRanking) {
+  const merged = {};
+  existingRanking.forEach((entry) => (merged[String(entry.songId)] = entry));
+  newRanking.forEach((entry) => (merged[String(entry.songId)] = entry));
+  return Object.keys(merged).map((songId) => merged[songId]);
+}
+
 function getStats_(version) {
   const rows = readRows_(getSheet_()).filter((row) => row.version === version);
-  const songRanks = {};
-  CONFIG.songIds.forEach((id) => (songRanks[id] = []));
+  const songScores = {};
+  CONFIG.songIds.forEach((id) => (songScores[id] = []));
   const participants = [];
   rows.forEach((row) => {
-    const ranking = JSON.parse(row.ranking_json);
+    const ranking = parseRanking_(row.ranking_json);
     const rankMap = {};
+    const scoreMap = {};
+    const maxRank = ranking.reduce((max, entry) => Math.max(max, Number(entry.rank)), 0);
     ranking.forEach((entry) => {
-      rankMap[entry.songId] = Number(entry.rank);
-      songRanks[entry.songId].push(Number(entry.rank));
+      const songId = String(entry.songId);
+      const rank = Number(entry.rank);
+      if (!songScores[songId] || !Number.isFinite(rank)) return;
+      rankMap[songId] = rank;
+      scoreMap[songId] = normalizedScore_(rank, maxRank);
+      songScores[songId].push(scoreMap[songId]);
     });
-    participants.push({ name: row.display_name, ranks: rankMap });
+    participants.push({ name: row.display_name, ranks: rankMap, scores: scoreMap });
   });
 
   const songs = CONFIG.songIds.map((songId) => {
-    const values = songRanks[songId].slice().sort((a, b) => a - b);
+    const values = songScores[songId];
     return {
       songId,
-      averageRank: round_(average_(values)),
-      medianRank: round_(median_(values)),
-      firstPlacePercent: percentage_(values.filter((rank) => rank === 1).length, rows.length),
-      lastPlacePercent: percentage_(
-        values.filter((rank) => rank === CONFIG.songIds.length).length,
-        rows.length
-      ),
+      sentiment: round_(average_(values) * 100),
       sampleSize: values.length
     };
   });
@@ -200,6 +218,7 @@ function getStats_(version) {
       participants.forEach((participant) => {
         const leftRank = participant.ranks[CONFIG.songIds[left]];
         const rightRank = participant.ranks[CONFIG.songIds[right]];
+        if (leftRank === undefined || rightRank === undefined) return;
         if (leftRank < rightRank) leftWins += 1;
         else if (rightRank < leftRank) rightWins += 1;
         else ties += 1;
@@ -218,31 +237,37 @@ function getStats_(version) {
   const correlations = [];
   for (let left = 0; left < CONFIG.songIds.length; left += 1) {
     for (let right = left + 1; right < CONFIG.songIds.length; right += 1) {
-      const leftValues = participants.map((participant) => participant.ranks[CONFIG.songIds[left]]);
-      const rightValues = participants.map(
-        (participant) => participant.ranks[CONFIG.songIds[right]]
-      );
+      const leftValues = [];
+      const rightValues = [];
+      participants.forEach((participant) => {
+        const leftScore = participant.scores[CONFIG.songIds[left]];
+        const rightScore = participant.scores[CONFIG.songIds[right]];
+        if (leftScore === undefined || rightScore === undefined) return;
+        leftValues.push(leftScore);
+        rightValues.push(rightScore);
+      });
       correlations.push({
         leftSongId: CONFIG.songIds[left],
         rightSongId: CONFIG.songIds[right],
         correlation: round_(correlation_(leftValues, rightValues)),
-        sampleSize: participants.length
+        sampleSize: leftValues.length
       });
     }
   }
 
   const consensus = {};
-  songs.forEach((song) => (consensus[song.songId] = song.averageRank));
+  songs.forEach((song) => (consensus[song.songId] = song.sentiment / 100));
   const participantStats = participants.map((participant) => {
-    const ids = CONFIG.songIds;
-    const actual = ids.map((id) => participant.ranks[id]);
-    const expected = ids.map((id) => consensus[id]);
-    const distance =
-      actual.reduce((sum, value, index) => sum + Math.abs(value - expected[index]), 0) / ids.length;
+    const ids = CONFIG.songIds.filter((id) => participant.scores[id] !== undefined);
+    const distance = ids.length
+      ? ids.reduce((sum, id) => sum + Math.abs(participant.scores[id] - consensus[id]), 0) /
+        ids.length
+      : 1;
     return {
       displayName: participant.name,
-      similarity: round_(Math.max(0, 100 - (distance / (ids.length - 1)) * 100)),
-      distance: round_(distance)
+      similarity: round_(Math.max(0, 100 - distance * 100)),
+      distance: round_(distance),
+      rankedSongCount: ids.length
     };
   });
 
@@ -254,6 +279,11 @@ function getStats_(version) {
     correlations,
     participants: participantStats
   };
+}
+
+function normalizedScore_(rank, maxRank) {
+  if (maxRank <= 1) return 0.5;
+  return 1 - (rank - 1) / (maxRank - 1);
 }
 
 function getSheet_() {
@@ -347,7 +377,7 @@ function json_(value, callback) {
 function postMessage_(value) {
   const body = JSON.stringify(value).replace(/</g, '\\u003c');
   const output = HtmlService.createHtmlOutput(
-    `<!doctype html><script>window.parent.postMessage(${body}, '*');</script>`
+    `<!doctype html><script>window.top.postMessage(${body}, '*');</script>`
   );
   return output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
