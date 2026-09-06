@@ -43,6 +43,7 @@ export type CommunityParticipantStats = {
   similarity: number;
   distance: number;
   rankedSongCount: number;
+  ranks?: Record<string, number>;
 };
 
 export type CommunityStats = {

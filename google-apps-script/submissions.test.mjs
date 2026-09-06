@@ -61,4 +61,6 @@ assert.equal(submit({ ...payload, action: 'delete' }).ok, true);
 assert.equal(rows.length, 0);
 assert.equal(submit({ ...payload, action: 'delete' }).ok, true, 'retry deletion safely');
 assert.equal(submit(payload).ok, true, 'can submit again after deletion');
+const stats = context.getStats_(['14', '9', '4']);
+assert.deepEqual(JSON.parse(JSON.stringify(stats.participants[0].ranks)), { '14': 1, '9': 2, '4': 3 });
 console.log('Passed: submit, update, errors, authenticated deletion, retry and resubmit.');

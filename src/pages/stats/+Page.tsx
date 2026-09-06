@@ -123,6 +123,35 @@ export function Page() {
               </Table.Root>
             </StatsSection>
 
+            <StatsSection title={t('community.individual_rankings')}>
+              <Table.Root size="sm">
+                <Table.Head>
+                  <Table.Row>
+                    <Table.Header>Name</Table.Header>
+                    {stats.songs.map((song) => (
+                      <Table.Header key={song.songId} style={{ whiteSpace: 'nowrap' }}>
+                        {songName(song.songId)}
+                      </Table.Header>
+                    ))}
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {stats.participants.map((participant, index) => (
+                    <Table.Row key={`${participant.displayName}-${index}`}>
+                      <Table.Cell style={{ whiteSpace: 'nowrap' }}>
+                        {participant.displayName}
+                      </Table.Cell>
+                      {stats.songs.map((song) => (
+                        <Table.Cell key={song.songId} textAlign="center">
+                          {participant.ranks?.[song.songId] ?? '—'}
+                        </Table.Cell>
+                      ))}
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
+            </StatsSection>
+
             <StatsSection title={t('community.matchups')}>
               <Table.Root size="sm">
                 <Table.Head>

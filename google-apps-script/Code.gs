@@ -267,7 +267,8 @@ function getStats_(requestedSongIds) {
       displayName: participant.name,
       similarity: round_(Math.max(0, 100 - distance * 100)),
       distance: round_(distance),
-      rankedSongCount: ids.length
+      rankedSongCount: ids.length,
+      ranks: participant.ranks
     };
   });
 

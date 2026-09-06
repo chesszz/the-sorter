@@ -39,6 +39,7 @@
     "loading": "統計を読み込み中…",
     "submissions": "件の送信",
     "consensus": "総合ランキング",
+    "individual_rankings": "個別ランキング",
     "rank": "順位",
     "song": "楽曲",
     "sentiment": "人気度",
