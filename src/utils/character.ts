@@ -1,5 +1,6 @@
 import type { Locale } from '~/i18n';
 import type { Character, WithRank } from '~/types';
+import { isEnglishLocale } from './names';
 
 export const getCharacterFromId = (
   data: Character[],
@@ -55,12 +56,12 @@ export const parseSortResult = (
 };
 
 export const getFullName = (character: Character, locale: Locale) => {
-  if (locale === 'en' && character.englishName) return character.englishName;
+  if (isEnglishLocale(locale) && character.englishName) return character.englishName;
   return character.fullName;
 };
 
 export const getCastName = (cast: Character['casts'][number], locale: Locale) => {
-  if (locale === 'en' && cast.englishName)
+  if (isEnglishLocale(locale) && cast.englishName)
     return cast.englishName.split(' ').toReversed().join(' ');
   return cast.seiyuu;
 };

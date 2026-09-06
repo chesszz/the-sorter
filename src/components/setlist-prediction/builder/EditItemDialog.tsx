@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import artistsData from '../../../../data/artists-info.json';
-import { getArtistName, getSongName } from '~/utils/names';
+import { getArtistName, getSongName, isEnglishLocale } from '~/utils/names';
 import {
   Root as DialogRoot,
   Backdrop as DialogBackdrop,
@@ -136,7 +136,7 @@ export function EditItemDialog({ open, onOpenChange, item, onSave }: EditItemDia
     return {
       id: song.id,
       displayName: getSongName(song.name, song.englishName, lang),
-      japaneseName: lang === 'en' && song.englishName ? song.name : undefined,
+      japaneseName: isEnglishLocale(lang) && song.englishName ? song.name : undefined,
       artist: artist ? getArtistName(artist.name, lang) : undefined,
       color: getSongColor(song)
     };
@@ -304,7 +304,7 @@ export function EditItemDialog({ open, onOpenChange, item, onSave }: EditItemDia
                                     <Text fontSize="sm" fontWeight="medium">
                                       {getSongName(song.name, song.englishName, lang)}
                                     </Text>
-                                    {lang === 'en' && song.englishName && (
+                                    {isEnglishLocale(lang) && song.englishName && (
                                       <Text color="fg.muted" fontSize="xs">
                                         {song.name}
                                       </Text>

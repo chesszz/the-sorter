@@ -6,7 +6,7 @@ import { Center, Box, HStack, Stack } from 'styled-system/jsx';
 import { token } from 'styled-system/tokens';
 import type { Artist, Song } from '~/types/songs';
 import { getSongColor } from '~/utils/song';
-import { getArtistName, getSongName } from '~/utils/names';
+import { getArtistName, getSongName, isEnglishLocale } from '~/utils/names';
 import { getAssetUrl } from '~/utils/assets';
 import { useArtistsData } from '~/hooks/useArtistsData';
 import { Heardle } from './Heardle';
@@ -225,7 +225,7 @@ export function SongCard({
             </a>
           )}
         </HStack>
-        {showInfo && lang === 'en' && song.englishName && (
+        {showInfo && isEnglishLocale(lang) && song.englishName && (
           <Text color="fg.muted" fontSize="xs">
             {song.name}
           </Text>
