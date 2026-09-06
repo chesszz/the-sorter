@@ -26,7 +26,7 @@ import type { GuessResult } from '~/hooks/useHeardleState';
 import type { PerformanceSortMeta } from '~/types/performance-sort';
 import { PerformanceOrderView } from './PerformanceOrderView';
 import { getFullPerformanceName } from '~/utils/names';
-import { addScreenshotFooter } from '~/utils/screenshot-footer';
+import { renderSongRankingScreenshot } from '~/utils/song-ranking-screenshot';
 import { CommunityRankingSubmission } from '~/components/community/CommunityRankingSubmission';
 
 export function SongResultsView({
@@ -58,7 +58,6 @@ export function SongResultsView({
   const [description, setDescription] = useState<string>();
   const [currentTab, setCurrentTab] = useLocalStorage<string>('songs-result-tab-v2', 'table');
   const [timestamp, setTimestamp] = useState(new Date());
-  const [showRenderingCanvas, setShowRenderingCanvas] = useState(false);
   const [isGeneratingScreenshot, setIsGeneratingScreenshot] = useState(false);
   const screenshotCache = useRef<{ key: string; blob: Blob } | undefined>(undefined);
   const { t, i18n: _i18n } = useTranslation();
@@ -123,50 +122,31 @@ export function SongResultsView({
     if (screenshotCache.current?.key === cacheKey) return screenshotCache.current.blob;
 
     setIsGeneratingScreenshot(true);
-    setShowRenderingCanvas(true);
     toast?.({ description: t('toast.generating_screenshot') });
     try {
       const generatedAt = new Date();
       setTimestamp(generatedAt);
-      const capturePromise = import('modern-screenshot').then((module) => module.domToCanvas);
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      });
-      const domToCanvas = await capturePromise;
-      const resultsBox = document.getElementById('results');
-      if (resultsBox) {
-        const style = getComputedStyle(resultsBox);
-        const resultsRect = resultsBox.getBoundingClientRect();
-        const contentBottom = Math.max(
-          ...Array.from(resultsBox.children).map((child) => child.getBoundingClientRect().bottom)
-        );
-        const verticalPadding =
-          Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom);
-        const captureHeight = Math.ceil(
-          Math.max(resultsBox.scrollHeight, contentBottom - resultsRect.top) - verticalPadding
-        );
-        const canvas = await domToCanvas(resultsBox, {
-          width: resultsBox.scrollWidth,
-          height: captureHeight,
-          quality: 1,
-          scale: 1,
-          type: 'image/png',
-          drawImageInterval: 0,
-          font: false,
-          style: { margin: '0', paddingTop: '0', paddingBottom: '0', transform: 'none' },
-          features: { removeControlCharacter: false, fixSvgXmlDecode: true }
-        });
-        const blob = await addScreenshotFooter(canvas, {
+      const style = getComputedStyle(document.body);
+      const blob = await renderSongRankingScreenshot({
+        title,
+        description,
+        songs,
+        locale: _i18n.language,
+        labels: {
+          ranking: t('ranking'),
+          title: t('song-name'),
+          thumbnail: t('thumbnail'),
           attribution: t('results.generated_by'),
-          timestamp: `${t('results.generated_at')}: ${generatedAt.toLocaleString()}`,
+          timestamp: `${t('results.generated_at')}: ${generatedAt.toLocaleString()}`
+        },
+        colors: {
           background: style.backgroundColor,
-          color: style.color
-        });
-        screenshotCache.current = { key: cacheKey, blob };
-        return blob;
-      }
+          text: style.color
+        }
+      });
+      screenshotCache.current = { key: cacheKey, blob };
+      return blob;
     } finally {
-      setShowRenderingCanvas(false);
       setIsGeneratingScreenshot(false);
     }
   };
@@ -433,39 +413,6 @@ export function SongResultsView({
           </Stack>
         )}
       </Stack>
-      {showRenderingCanvas && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: '-10000px',
-            width: '1280px',
-            overflow: 'visible',
-            pointerEvents: 'none'
-          }}
-        >
-          <Stack id="results" width="1280px" p="4" bgColor="bg.canvas">
-            {title && (
-              <Heading fontSize="2xl" fontWeight="bold">
-                {title}
-              </Heading>
-            )}
-            {description && <Text>{description}</Text>}
-            <HStack gap="6" alignItems="flex-start" width="full">
-              {[
-                songs.slice(0, Math.ceil(songs.length / 2)),
-                songs.slice(Math.ceil(songs.length / 2))
-              ]
-                .filter((column) => column.length > 0)
-                .map((column, index) => (
-                  <Box key={index} flex="1" minW="0">
-                    <SongRankingTable songs={column} eagerImages />
-                  </Box>
-                ))}
-            </HStack>
-          </Stack>
-        </div>
-      )}
     </>
   );
 }
