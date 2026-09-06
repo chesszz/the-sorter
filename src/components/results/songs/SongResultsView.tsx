@@ -135,12 +135,22 @@ export function SongResultsView({
       const domToCanvas = await capturePromise;
       const resultsBox = document.getElementById('results');
       if (resultsBox) {
+        const resultsRect = resultsBox.getBoundingClientRect();
+        const contentBottom = Math.max(
+          ...Array.from(resultsBox.children).map((child) => child.getBoundingClientRect().bottom)
+        );
+        const captureHeight = Math.ceil(
+          Math.max(resultsBox.scrollHeight, contentBottom - resultsRect.top)
+        );
         const canvas = await domToCanvas(resultsBox, {
+          width: resultsBox.scrollWidth,
+          height: captureHeight,
           quality: 1,
           scale: 1,
           type: 'image/png',
           drawImageInterval: 0,
           font: false,
+          style: { margin: '0', transform: 'none' },
           features: { removeControlCharacter: false, fixSvgXmlDecode: true }
         });
         const style = getComputedStyle(resultsBox);
