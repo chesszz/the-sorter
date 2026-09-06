@@ -1,6 +1,5 @@
 const CONFIG = {
-  sheetName: 'submissions',
-  songIds: ['14', '9', '4', '6', '3', '16', '7', '15', '5', '13', '2', '1', '10', '11', '8', '12']
+  sheetName: 'submissions'
 };
 
 const HEADERS = [
@@ -28,7 +27,7 @@ function doGet(event) {
       return json_(
         {
           ok: true,
-          data: getStats_()
+          data: getStats_(parseSongIds_(event.parameter.songIds))
         },
         event.parameter.callback
       );
@@ -155,16 +154,14 @@ function saveSubmission_(body) {
 }
 
 function validateRanking_(ranking) {
-  if (!Array.isArray(ranking) || ranking.length < 2 || ranking.length > CONFIG.songIds.length) {
+  if (!Array.isArray(ranking) || ranking.length < 2 || ranking.length > 1000) {
     throw new Error('Rank at least two songs.');
   }
-  const validIds = {};
-  CONFIG.songIds.forEach((id) => (validIds[id] = true));
   const seen = {};
   return ranking.map((entry) => {
     const songId = String(entry.songId || '');
     const rank = Number(entry.rank);
-    if (!validIds[songId] || seen[songId] || !Number.isFinite(rank)) {
+    if (!/^\d+$/.test(songId) || seen[songId] || !Number.isFinite(rank) || rank < 1) {
       throw new Error('The ranking contains invalid or duplicate songs.');
     }
     seen[songId] = true;
@@ -181,10 +178,11 @@ function parseRanking_(rankingJson) {
   }
 }
 
-function getStats_() {
+function getStats_(requestedSongIds) {
   const rows = readRows_(getSheet_());
+  const songIds = requestedSongIds.length ? requestedSongIds : getSongIdsFromRows_(rows);
   const songScores = {};
-  CONFIG.songIds.forEach((id) => (songScores[id] = []));
+  songIds.forEach((id) => (songScores[id] = []));
   const participants = [];
   rows.forEach((row) => {
     const ranking = parseRanking_(row.ranking_json);
@@ -202,7 +200,7 @@ function getStats_() {
     participants.push({ name: row.display_name, ranks: rankMap, scores: scoreMap });
   });
 
-  const songs = CONFIG.songIds.map((songId) => {
+  const songs = songIds.map((songId) => {
     const values = songScores[songId];
     return {
       songId,
@@ -212,22 +210,22 @@ function getStats_() {
   });
 
   const matchups = [];
-  for (let left = 0; left < CONFIG.songIds.length; left += 1) {
-    for (let right = left + 1; right < CONFIG.songIds.length; right += 1) {
+  for (let left = 0; left < songIds.length; left += 1) {
+    for (let right = left + 1; right < songIds.length; right += 1) {
       let leftWins = 0;
       let rightWins = 0;
       let ties = 0;
       participants.forEach((participant) => {
-        const leftRank = participant.ranks[CONFIG.songIds[left]];
-        const rightRank = participant.ranks[CONFIG.songIds[right]];
+        const leftRank = participant.ranks[songIds[left]];
+        const rightRank = participant.ranks[songIds[right]];
         if (leftRank === undefined || rightRank === undefined) return;
         if (leftRank < rightRank) leftWins += 1;
         else if (rightRank < leftRank) rightWins += 1;
         else ties += 1;
       });
       matchups.push({
-        leftSongId: CONFIG.songIds[left],
-        rightSongId: CONFIG.songIds[right],
+        leftSongId: songIds[left],
+        rightSongId: songIds[right],
         leftWins,
         rightWins,
         ties,
@@ -237,20 +235,20 @@ function getStats_() {
   }
 
   const correlations = [];
-  for (let left = 0; left < CONFIG.songIds.length; left += 1) {
-    for (let right = left + 1; right < CONFIG.songIds.length; right += 1) {
+  for (let left = 0; left < songIds.length; left += 1) {
+    for (let right = left + 1; right < songIds.length; right += 1) {
       const leftValues = [];
       const rightValues = [];
       participants.forEach((participant) => {
-        const leftScore = participant.scores[CONFIG.songIds[left]];
-        const rightScore = participant.scores[CONFIG.songIds[right]];
+        const leftScore = participant.scores[songIds[left]];
+        const rightScore = participant.scores[songIds[right]];
         if (leftScore === undefined || rightScore === undefined) return;
         leftValues.push(leftScore);
         rightValues.push(rightScore);
       });
       correlations.push({
-        leftSongId: CONFIG.songIds[left],
-        rightSongId: CONFIG.songIds[right],
+        leftSongId: songIds[left],
+        rightSongId: songIds[right],
         correlation: round_(correlation_(leftValues, rightValues)),
         sampleSize: leftValues.length
       });
@@ -260,7 +258,7 @@ function getStats_() {
   const consensus = {};
   songs.forEach((song) => (consensus[song.songId] = song.sentiment / 100));
   const participantStats = participants.map((participant) => {
-    const ids = CONFIG.songIds.filter((id) => participant.scores[id] !== undefined);
+    const ids = songIds.filter((id) => participant.scores[id] !== undefined);
     const distance = ids.length
       ? ids.reduce((sum, id) => sum + Math.abs(participant.scores[id] - consensus[id]), 0) /
         ids.length
@@ -280,6 +278,28 @@ function getStats_() {
     correlations,
     participants: participantStats
   };
+}
+
+function parseSongIds_(value) {
+  return Array.from(
+    new Set(
+      String(value || '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => /^\d+$/.test(id))
+    )
+  ).slice(0, 1000);
+}
+
+function getSongIdsFromRows_(rows) {
+  const ids = [];
+  rows.forEach((row) => {
+    parseRanking_(row.ranking_json).forEach((entry) => {
+      const songId = String(entry.songId || '');
+      if (/^\d+$/.test(songId) && !ids.includes(songId)) ids.push(songId);
+    });
+  });
+  return ids;
 }
 
 function normalizedScore_(rank, maxRank) {

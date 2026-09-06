@@ -230,13 +230,14 @@ export async function deleteCommunityRanking(saved: SavedCommunitySubmission) {
   }
 }
 
-export async function fetchCommunityStats() {
+export async function fetchCommunityStats(songIds: string[]) {
   if (!isCommunityRankingsConfigured) {
     throw new Error('Community rankings are not configured.');
   }
 
   const url = new URL(API_URL);
   url.searchParams.set('action', 'stats');
+  url.searchParams.set('songIds', songIds.join(','));
   return new Promise<CommunityStats>((resolve, reject) => {
     const callbackName = `communityStats_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const script = document.createElement('script');

@@ -40,7 +40,7 @@ export function Page() {
       setLoading(false);
       return;
     }
-    fetchCommunityStats()
+    fetchCommunityStats(songs.map((song) => song.id))
       .then((data) => {
         setStats(data);
         setLoading(false);
@@ -50,7 +50,7 @@ export function Page() {
         setError(reason instanceof Error ? reason.message : t('community.stats_error'));
         setLoading(false);
       });
-  }, [t]);
+  }, [songs, t]);
 
   const songName = (id: string) => names.get(id) ?? id;
   const divisiveMatchups = [...(stats?.matchups ?? [])]
