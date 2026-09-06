@@ -119,7 +119,7 @@ export function SongResultsView({
       if (resultsBox) {
         return await domToBlob(resultsBox, {
           quality: 1,
-          scale: 2,
+          scale: 1,
           type: 'image/png',
           features: { removeControlCharacter: false }
         });
