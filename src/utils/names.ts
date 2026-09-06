@@ -31,7 +31,8 @@ export const getSongName = (
   englishName: string | undefined,
   locale: Locale | undefined
 ): string => {
-  if (isEnglishLocale(locale) && englishName) return englishName;
+  const language = locale?.toLowerCase().split('-')[0];
+  if (language && language !== 'ja' && englishName) return englishName;
   return name;
 };
 
