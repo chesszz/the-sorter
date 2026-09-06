@@ -58,6 +58,7 @@ export function SongResultsView({
   const [currentTab, setCurrentTab] = useLocalStorage<string>('songs-result-tab-v2', 'table');
   const [timestamp, setTimestamp] = useState(new Date());
   const [showRenderingCanvas, setShowRenderingCanvas] = useState(false);
+  const [isGeneratingScreenshot, setIsGeneratingScreenshot] = useState(false);
   const { t, i18n: _i18n } = useTranslation();
 
   const effectiveTitlePrefix = performanceMeta
@@ -108,20 +109,24 @@ export function SongResultsView({
   }, [order, songsData, failedSongIds]);
 
   const makeScreenshot = async () => {
+    setIsGeneratingScreenshot(true);
     setShowRenderingCanvas(true);
     toast?.({ description: t('toast.generating_screenshot') });
-    const domToBlob = await import('modern-screenshot').then((module) => module.domToBlob);
-    const resultsBox = document.getElementById('results');
-    setTimestamp(new Date());
-    if (resultsBox) {
-      const shareImage = await domToBlob(resultsBox, {
-        quality: 1,
-        scale: 2,
-        type: 'image/png',
-        features: { removeControlCharacter: false }
-      });
+    try {
+      const domToBlob = await import('modern-screenshot').then((module) => module.domToBlob);
+      const resultsBox = document.getElementById('results');
+      setTimestamp(new Date());
+      if (resultsBox) {
+        return await domToBlob(resultsBox, {
+          quality: 1,
+          scale: 2,
+          type: 'image/png',
+          features: { removeControlCharacter: false }
+        });
+      }
+    } finally {
       setShowRenderingCanvas(false);
-      return shareImage;
+      setIsGeneratingScreenshot(false);
     }
   };
 
@@ -259,7 +264,12 @@ export function SongResultsView({
                 <Button variant="subtle" onClick={() => void exportText()}>
                   <FaCopy /> {t('results.copy_text')}
                 </Button>
-                <Button variant="subtle" onClick={() => void screenshot()}>
+                <Button
+                  variant="subtle"
+                  loading={isGeneratingScreenshot}
+                  loadingText={t('toast.generating_screenshot')}
+                  onClick={() => void screenshot()}
+                >
                   <FaCopy /> {t('results.copy')}
                 </Button>
                 <Button onClick={() => void download()}>
