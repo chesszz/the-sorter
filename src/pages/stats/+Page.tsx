@@ -127,6 +127,60 @@ export function Page() {
               </Table.Root>
             </StatsSection>
 
+            <HStack gap="8" alignItems="start" flexWrap="wrap">
+              <StatsSection
+                title={t('community.matchups')}
+                flex="1"
+                minW={{ base: 'full', md: '0' }}
+              >
+                <Table.Root size="sm">
+                  <Table.Head>
+                    <Table.Row>
+                      <Table.Header>{t('community.song')}</Table.Header>
+                      <Table.Header>{t('community.song')}</Table.Header>
+                      <Table.Header>{t('community.split')}</Table.Header>
+                    </Table.Row>
+                  </Table.Head>
+                  <Table.Body>
+                    {divisiveMatchups.map((matchup) => (
+                      <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
+                        <Table.Cell>{songName(matchup.leftSongId)}</Table.Cell>
+                        <Table.Cell>{songName(matchup.rightSongId)}</Table.Cell>
+                        <Table.Cell>
+                          {matchup.leftWins}–{matchup.rightWins}
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table.Root>
+              </StatsSection>
+
+              <StatsSection
+                title={t('community.correlations')}
+                flex="1"
+                minW={{ base: 'full', md: '0' }}
+              >
+                <Table.Root size="sm">
+                  <Table.Head>
+                    <Table.Row>
+                      <Table.Header>{t('community.song')}</Table.Header>
+                      <Table.Header>{t('community.song')}</Table.Header>
+                      <Table.Header>{t('community.correlation')}</Table.Header>
+                    </Table.Row>
+                  </Table.Head>
+                  <Table.Body>
+                    {correlations.map((pair) => (
+                      <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
+                        <Table.Cell>{songName(pair.leftSongId)}</Table.Cell>
+                        <Table.Cell>{songName(pair.rightSongId)}</Table.Cell>
+                        <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table.Root>
+              </StatsSection>
+            </HStack>
+
             <StatsSection title={t('community.individual_rankings')}>
               <Table.Root size="sm">
                 <Table.Head>
@@ -199,52 +253,6 @@ export function Page() {
                       </Table.Row>
                     );
                   })}
-                </Table.Body>
-              </Table.Root>
-            </StatsSection>
-
-            <StatsSection title={t('community.matchups')}>
-              <Table.Root size="sm">
-                <Table.Head>
-                  <Table.Row>
-                    <Table.Header>{t('community.song')}</Table.Header>
-                    <Table.Header>{t('community.song')}</Table.Header>
-                    <Table.Header>{t('community.split')}</Table.Header>
-                    <Table.Header>{t('community.submissions')}</Table.Header>
-                  </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                  {divisiveMatchups.map((matchup) => (
-                    <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
-                      <Table.Cell>{songName(matchup.leftSongId)}</Table.Cell>
-                      <Table.Cell>{songName(matchup.rightSongId)}</Table.Cell>
-                      <Table.Cell>
-                        {matchup.leftWins}–{matchup.rightWins}
-                      </Table.Cell>
-                      <Table.Cell>{matchup.total}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </StatsSection>
-
-            <StatsSection title={t('community.correlations')}>
-              <Table.Root size="sm">
-                <Table.Head>
-                  <Table.Row>
-                    <Table.Header>{t('community.song')}</Table.Header>
-                    <Table.Header>{t('community.song')}</Table.Header>
-                    <Table.Header>{t('community.correlation')}</Table.Header>
-                  </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                  {correlations.map((pair) => (
-                    <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
-                      <Table.Cell>{songName(pair.leftSongId)}</Table.Cell>
-                      <Table.Cell>{songName(pair.rightSongId)}</Table.Cell>
-                      <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
-                    </Table.Row>
-                  ))}
                 </Table.Body>
               </Table.Root>
             </StatsSection>
