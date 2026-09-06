@@ -88,6 +88,14 @@ export function Page() {
             {error}
           </Text>
         )}
+        {error && (
+          <Text color="fg.muted" textAlign="center">
+            {t('community.stats_help')}{' '}
+            <a href="https://discord.com/app" target="_blank" rel="noreferrer">
+              {t('community.discord_link')}
+            </a>
+          </Text>
+        )}
         {stats && (
           <Stack gap="8" w="full">
             <StatsSection title={t('community.consensus')}>
@@ -96,19 +104,19 @@ export function Page() {
                   <Table.Row>
                     <Table.Header>{t('community.rank')}</Table.Header>
                     <Table.Header>{t('community.song')}</Table.Header>
-                    <Table.Header>{t('community.average_rank')}</Table.Header>
-                    <Table.Header>{t('community.first_place')}</Table.Header>
+                    <Table.Header>{t('community.sentiment')}</Table.Header>
+                    <Table.Header>{t('community.sample_size')}</Table.Header>
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
                   {[...stats.songs]
-                    .toSorted((a, b) => a.averageRank - b.averageRank)
+                    .toSorted((a, b) => b.sentiment - a.sentiment)
                     .map((song, index) => (
                       <Table.Row key={song.songId}>
                         <Table.Cell>{index + 1}</Table.Cell>
                         <Table.Cell>{songName(song.songId)}</Table.Cell>
-                        <Table.Cell>{song.averageRank.toFixed(2)}</Table.Cell>
-                        <Table.Cell>{formatPercent(song.firstPlacePercent)}</Table.Cell>
+                        <Table.Cell>{formatPercent(song.sentiment)}</Table.Cell>
+                        <Table.Cell>{song.sampleSize}</Table.Cell>
                       </Table.Row>
                     ))}
                 </Table.Body>

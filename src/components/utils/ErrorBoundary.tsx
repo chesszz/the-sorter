@@ -5,7 +5,6 @@ import type { WithTranslation } from 'react-i18next';
 import { withTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Code } from '../ui/code';
-import { Link } from '../ui/link';
 import { Text } from '../ui/text';
 import { SentryContext } from './SentryContext';
 import { Center, Stack, Wrap } from 'styled-system/jsx';
@@ -57,9 +56,9 @@ class ErrorBoundaryInner extends React.Component<
             <Text fontSize="2xl">{this.props.t('error_page.title')}</Text>
             <Text>
               {this.props.t('error_page.text')}
-              <Link href="https://discordapp.com/users/260776161032798208" target="_blank">
+              <a href="https://discord.com/app" target="_blank" rel="noreferrer">
                 {this.props.t('error_page.discord_link')}
-              </Link>
+              </a>
               {this.props.t('error_page.to_fix_it')}
             </Text>
             <Code p="4" whiteSpace="pre-wrap">

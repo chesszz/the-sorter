@@ -19,10 +19,7 @@ export type SavedCommunitySubmission = {
 
 export type CommunitySongStats = {
   songId: string;
-  averageRank: number;
-  medianRank: number;
-  firstPlacePercent: number;
-  lastPlacePercent: number;
+  sentiment: number;
   sampleSize: number;
 };
 
@@ -46,6 +43,7 @@ export type CommunityParticipantStats = {
   displayName: string;
   similarity: number;
   distance: number;
+  rankedSongCount: number;
 };
 
 export type CommunityStats = {
