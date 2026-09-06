@@ -351,7 +351,7 @@ function getStats_(requestedSongIds) {
       : 1;
     return {
       displayName: participant.name,
-      similarity: round_(Math.max(0, 100 - distance * 100)),
+      similarity: similarityFromDistance_(distance),
       distance: round_(distance),
       rankedSongCount: ids.length,
       ranks: participant.ranks
@@ -487,6 +487,11 @@ function round_(value) {
 
 function roundOneDecimal_(value) {
   return Math.round(value * 10) / 10;
+}
+
+function similarityFromDistance_(distance) {
+  const closeness = Math.max(0, 1 - distance);
+  return round_(closeness * closeness * 100);
 }
 
 function json_(value, callback) {
