@@ -145,18 +145,46 @@ export function SongResultsView({
   };
 
   const screenshot = async () => {
-    const shareImage = await makeScreenshot();
-    if (!shareImage) return;
     try {
-      await navigator.share({
-        text: t('share.copy_text'),
-        files: [new File([shareImage], 'll-sorted.png')]
-      });
-    } catch {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': shareImage }, { presentationStyle: 'attachment' })
-      ]);
-      toast?.({ description: t('toast.screenshot_copied') });
+      const shareImage = await makeScreenshot();
+      if (!shareImage) return;
+
+      const shareFile = new File([shareImage], 'll-sorted.png');
+      if (
+        typeof navigator.share === 'function' &&
+        (!navigator.canShare || navigator.canShare({ files: [shareFile] }))
+      ) {
+        try {
+          await navigator.share({
+            text: t('share.copy_text'),
+            files: [shareFile]
+          });
+          return;
+        } catch (error) {
+          console.warn('Image sharing is unavailable; trying the clipboard instead.', error);
+        }
+      }
+
+      if (
+        typeof ClipboardItem !== 'undefined' &&
+        typeof navigator.clipboard?.write === 'function'
+      ) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': shareImage }, { presentationStyle: 'attachment' })
+          ]);
+          toast?.({ description: t('toast.screenshot_copied') });
+          return;
+        } catch (error) {
+          console.warn('Image clipboard is unavailable; downloading instead.', error);
+        }
+      }
+
+      await saveScreenshot(shareImage);
+      toast?.({ description: t('toast.screenshot_downloaded') });
+    } catch (error) {
+      console.error(error);
+      toast?.({ description: t('toast.screenshot_failed') });
     }
   };
 
@@ -202,14 +230,19 @@ export function SongResultsView({
     toast?.({ description: t('toast.text_copied') });
   };
 
+  const saveScreenshot = async (blob: Blob) => {
+    const saveAs = (await import('file-saver')).saveAs;
+    saveAs(new File([blob], `${effectiveTitlePrefix ?? 'll'}-sorted-${timestamp.valueOf()}.png`));
+  };
+
   const download = async () => {
     try {
       const blob = await makeScreenshot();
       if (!blob) return;
-      const saveAs = (await import('file-saver')).saveAs;
-      saveAs(new File([blob], `${effectiveTitlePrefix ?? 'll'}-sorted-${timestamp.valueOf()}.png`));
+      await saveScreenshot(blob);
     } catch (error) {
       console.error(error);
+      toast?.({ description: t('toast.screenshot_failed') });
     }
   };
 

@@ -215,6 +215,8 @@
   "toast": {
     "url_copied": "URLをコピーしました",
     "screenshot_copied": "画像をコピーしました",
+    "screenshot_downloaded": "画像をコピーできないため、代わりにダウンロードしました。",
+    "screenshot_failed": "画像を作成できませんでした。",
     "generating_screenshot": "画像生成しています…",
     "tie_not_allowed": "DDはダメです。",
     "text_copied": "結果をコピーしました"

@@ -217,6 +217,8 @@
   "toast": {
     "url_copied": "URL Copied to Clipboard",
     "screenshot_copied": "Screenshot Copied to Clipboard",
+    "screenshot_downloaded": "Clipboard image copying is unavailable; downloaded instead.",
+    "screenshot_failed": "Could not create the screenshot.",
     "generating_screenshot": "Generating Screenshot...",
     "tie_not_allowed": "DD is not Allowed here.",
     "text_copied": "Text copied to clipboard"
