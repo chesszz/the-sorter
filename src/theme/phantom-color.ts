@@ -1,0 +1,93 @@
+import { defineSemanticTokens, defineTokens } from '@pandacss/dev';
+
+const tokens = defineTokens.colors({
+  light: {
+    1: { value: '#fffafa' },
+    2: { value: '#fff0ea' },
+    3: { value: '#ffe8e8' },
+    4: { value: '#f8dada' },
+    5: { value: '#edcfcf' },
+    6: { value: '#d9a6a6' },
+    7: { value: '#c77f7f' },
+    8: { value: '#a93f3f' },
+    9: { value: '#600e0e' },
+    10: { value: '#4c0000' },
+    11: { value: '#991b1b' },
+    12: { value: '#300000' },
+    a1: { value: '#cc151505' },
+    a2: { value: '#cc15150f' },
+    a3: { value: '#cc15151c' },
+    a4: { value: '#cc151529' },
+    a5: { value: '#a5121238' },
+    a6: { value: '#8f101052' },
+    a7: { value: '#790d0d70' },
+    a8: { value: '#700b0b99' },
+    a9: { value: '#570000f1' },
+    a10: { value: '#4c0000' },
+    a11: { value: '#900f0fe8' },
+    a12: { value: '#300000' }
+  },
+  dark: {
+    1: { value: '#0b090b' },
+    2: { value: '#19171b' },
+    3: { value: '#2b0b0b' },
+    4: { value: '#3b0b0b' },
+    5: { value: '#4c0000' },
+    6: { value: '#600e0e' },
+    7: { value: '#7e1212' },
+    8: { value: '#a01919' },
+    9: { value: '#cc1515' },
+    10: { value: '#ef1717' },
+    11: { value: '#fc8e8e' },
+    12: { value: '#ffe8e8' },
+    a1: { value: '#cc151508' },
+    a2: { value: '#ffeded10' },
+    a3: { value: '#fd202022' },
+    a4: { value: '#ff161634' },
+    a5: { value: '#ff111147' },
+    a6: { value: '#ff17175c' },
+    a7: { value: '#ff202079' },
+    a8: { value: '#ff29299c' },
+    a9: { value: '#ff1919c9' },
+    a10: { value: '#ff1818ed' },
+    a11: { value: '#ff9090fa' },
+    a12: { value: '#ffe8e8' }
+  }
+});
+
+const semanticTokens = defineSemanticTokens.colors({
+  1: { value: { _light: '{colors.phantom.light.1}', _dark: '{colors.phantom.dark.1}' } },
+  2: { value: { _light: '{colors.phantom.light.2}', _dark: '{colors.phantom.dark.2}' } },
+  3: { value: { _light: '{colors.phantom.light.3}', _dark: '{colors.phantom.dark.3}' } },
+  4: { value: { _light: '{colors.phantom.light.4}', _dark: '{colors.phantom.dark.4}' } },
+  5: { value: { _light: '{colors.phantom.light.5}', _dark: '{colors.phantom.dark.5}' } },
+  6: { value: { _light: '{colors.phantom.light.6}', _dark: '{colors.phantom.dark.6}' } },
+  7: { value: { _light: '{colors.phantom.light.7}', _dark: '{colors.phantom.dark.7}' } },
+  8: { value: { _light: '{colors.phantom.light.8}', _dark: '{colors.phantom.dark.8}' } },
+  9: { value: { _light: '{colors.phantom.light.9}', _dark: '{colors.phantom.dark.9}' } },
+  10: { value: { _light: '{colors.phantom.light.10}', _dark: '{colors.phantom.dark.10}' } },
+  11: { value: { _light: '{colors.phantom.light.11}', _dark: '{colors.phantom.dark.11}' } },
+  12: { value: { _light: '{colors.phantom.light.12}', _dark: '{colors.phantom.dark.12}' } },
+  a1: { value: { _light: '{colors.phantom.light.a1}', _dark: '{colors.phantom.dark.a1}' } },
+  a2: { value: { _light: '{colors.phantom.light.a2}', _dark: '{colors.phantom.dark.a2}' } },
+  a3: { value: { _light: '{colors.phantom.light.a3}', _dark: '{colors.phantom.dark.a3}' } },
+  a4: { value: { _light: '{colors.phantom.light.a4}', _dark: '{colors.phantom.dark.a4}' } },
+  a5: { value: { _light: '{colors.phantom.light.a5}', _dark: '{colors.phantom.dark.a5}' } },
+  a6: { value: { _light: '{colors.phantom.light.a6}', _dark: '{colors.phantom.dark.a6}' } },
+  a7: { value: { _light: '{colors.phantom.light.a7}', _dark: '{colors.phantom.dark.a7}' } },
+  a8: { value: { _light: '{colors.phantom.light.a8}', _dark: '{colors.phantom.dark.a8}' } },
+  a9: { value: { _light: '{colors.phantom.light.a9}', _dark: '{colors.phantom.dark.a9}' } },
+  a10: { value: { _light: '{colors.phantom.light.a10}', _dark: '{colors.phantom.dark.a10}' } },
+  a11: { value: { _light: '{colors.phantom.light.a11}', _dark: '{colors.phantom.dark.a11}' } },
+  a12: { value: { _light: '{colors.phantom.light.a12}', _dark: '{colors.phantom.dark.a12}' } },
+  default: { value: { _light: '{colors.phantom.light.9}', _dark: '{colors.phantom.dark.9}' } },
+  emphasized: { value: { _light: '{colors.phantom.light.10}', _dark: '{colors.phantom.dark.10}' } },
+  fg: { value: 'white' },
+  text: { value: { _light: '{colors.phantom.light.11}', _dark: '{colors.phantom.dark.11}' } }
+});
+
+export const phantom = {
+  name: 'phantom',
+  tokens,
+  semanticTokens
+};

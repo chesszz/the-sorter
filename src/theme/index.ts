@@ -11,75 +11,30 @@ export const theme: PartialTheme = {
       }
     }
   },
-  tokens: {
-    colors: {
-      ll: {
-        1: { value: '#170e11' },
-        2: { value: '#211217' },
-        3: { value: '#3c1223' },
-        4: { value: '#53082c' },
-        5: { value: '#620f36' },
-        6: { value: '#731d43' },
-        7: { value: '#8e2c56' },
-        8: { value: '#b7386f' },
-        9: { value: '#e4007f' },
-        10: { value: '#d40072' },
-        11: { value: '#ff87b8' },
-        12: { value: '#ffd0e0' },
-        a1: { value: '#ec001207' },
-        a2: { value: '#f4206612' },
-        a3: { value: '#fb17732f' },
-        a4: { value: '#ff007247' },
-        a5: { value: '#ff0c7e57' },
-        a6: { value: '#ff2f8b69' },
-        a7: { value: '#ff459586' },
-        a8: { value: '#ff4998b2' },
-        a9: { value: '#fe008ce3' },
-        a10: { value: '#ff0088d1' },
-        a11: { value: '#ff87b8' },
-        a12: { value: '#ffd0e0' }
-      }
-    }
-  },
   semanticTokens: {
     colors: {
-      accent: {
-        1: { value: '{colors.ll.1}' },
-        2: { value: '{colors.ll.2}' },
-        3: { value: '{colors.ll.3}' },
-        4: { value: '{colors.ll.4}' },
-        5: { value: '{colors.ll.5}' },
-        6: { value: '{colors.ll.6}' },
-        7: { value: '{colors.ll.7}' },
-        8: { value: '{colors.ll.8}' },
-        9: { value: '{colors.ll.9}' },
-        10: { value: '{colors.ll.10}' },
-        11: { value: '{colors.ll.11}' },
-        12: { value: '{colors.ll.12}' },
-        a1: { value: '{colors.ll.a1}' },
-        a2: { value: '{colors.ll.a2}' },
-        a3: { value: '{colors.ll.a3}' },
-        a4: { value: '{colors.ll.a4}' },
-        a5: { value: '{colors.ll.a5}' },
-        a6: { value: '{colors.ll.a6}' },
-        a7: { value: '{colors.ll.a7}' },
-        a8: { value: '{colors.ll.a8}' },
-        a9: { value: '{colors.ll.a9}' },
-        a10: { value: '{colors.ll.a10}' },
-        a11: { value: '{colors.ll.a11}' },
-        a12: { value: '{colors.ll.a12}' },
-        default: {
-          value: '{colors.ll.9}'
-        },
-        emphasized: {
-          value: '{colors.ll.10}'
-        },
-        fg: {
-          value: '{colors.white}'
-        },
-        text: {
-          value: '{colors.ll.a11}'
-        }
+      bg: {
+        canvas: { value: { _light: '#fffafa', _dark: '#050406' } },
+        default: { value: { _light: '#fff0ea', _dark: '#050406' } },
+        subtle: { value: { _light: '#edcfcf', _dark: '#19171b' } },
+        muted: { value: { _light: '#d9a6a6', _dark: '#2b0b0b' } },
+        emphasized: { value: { _light: '#fc8e8e', _dark: '#4c0000' } },
+        disabled: { value: { _light: '#a5a5a5', _dark: '#595959' } }
+      },
+      fg: {
+        default: { value: { _light: '#050406', _dark: '#ffe8e8' } },
+        muted: { value: { _light: '#595959', _dark: '#cfdfe6' } },
+        subtle: { value: { _light: '#767676', _dark: '#a5a5a5' } },
+        disabled: { value: { _light: '#a5a5a5', _dark: '#595959' } },
+        error: { value: { _light: '#cc1515', _dark: '#fc8e8e' } }
+      },
+      border: {
+        default: { value: { _light: '#d9a6a6', _dark: '#600e0e' } },
+        muted: { value: { _light: '#edcfcf', _dark: '#4c0000' } },
+        subtle: { value: { _light: '#ffe8e8', _dark: '#2b0b0b' } },
+        disabled: { value: { _light: '#a5a5a5', _dark: '#595959' } },
+        outline: { value: { _light: '#600e0e66', _dark: '#fc8e8e88' } },
+        error: { value: { _light: '#cc1515', _dark: '#fc8e8e' } }
       }
     }
   },
