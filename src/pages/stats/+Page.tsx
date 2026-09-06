@@ -8,6 +8,7 @@ import { Table } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
 import { useSongData } from '~/hooks/useSongData';
 import { getSongName } from '~/utils/names';
+import { getAssetUrl } from '~/utils/assets';
 import {
   fetchCommunityStats,
   isCommunityRankingsConfigured,
@@ -35,6 +36,10 @@ export function Page() {
         songs.map((song) => [song.id, getSongName(song.name, song.englishName, i18n.language)])
       ),
     [songs, i18n.language]
+  );
+  const thumbnails = useMemo(
+    () => new Map(songs.map((song) => [song.id, song.thumbnail])),
+    [songs]
   );
 
   useEffect(() => {
@@ -118,7 +123,12 @@ export function Page() {
                     .map((song, index) => (
                       <Table.Row key={song.songId}>
                         <Table.Cell>{index + 1}</Table.Cell>
-                        <Table.Cell>{songName(song.songId)}</Table.Cell>
+                        <Table.Cell>
+                          <SongLabel
+                            name={songName(song.songId)}
+                            thumbnail={thumbnails.get(song.songId)}
+                          />
+                        </Table.Cell>
                         <Table.Cell>{formatPercent(song.sentiment)}</Table.Cell>
                         <Table.Cell>{song.sampleSize}</Table.Cell>
                       </Table.Row>
@@ -144,8 +154,18 @@ export function Page() {
                   <Table.Body>
                     {divisiveMatchups.map((matchup) => (
                       <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
-                        <Table.Cell>{songName(matchup.leftSongId)}</Table.Cell>
-                        <Table.Cell>{songName(matchup.rightSongId)}</Table.Cell>
+                        <Table.Cell>
+                          <SongLabel
+                            name={songName(matchup.leftSongId)}
+                            thumbnail={thumbnails.get(matchup.leftSongId)}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>
+                          <SongLabel
+                            name={songName(matchup.rightSongId)}
+                            thumbnail={thumbnails.get(matchup.rightSongId)}
+                          />
+                        </Table.Cell>
                         <Table.Cell>
                           {matchup.leftWins}–{matchup.rightWins}
                         </Table.Cell>
@@ -171,13 +191,32 @@ export function Page() {
                   <Table.Body>
                     {correlations.map((pair) => (
                       <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
-                        <Table.Cell>{songName(pair.leftSongId)}</Table.Cell>
-                        <Table.Cell>{songName(pair.rightSongId)}</Table.Cell>
+                        <Table.Cell>
+                          <SongLabel
+                            name={songName(pair.leftSongId)}
+                            thumbnail={thumbnails.get(pair.leftSongId)}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>
+                          <SongLabel
+                            name={songName(pair.rightSongId)}
+                            thumbnail={thumbnails.get(pair.rightSongId)}
+                          />
+                        </Table.Cell>
                         <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
                 </Table.Root>
+              </StatsSection>
+            </HStack>
+
+            <HStack gap="8" alignItems="start" flexWrap="wrap">
+              <StatsSection title={t('community.mainstream')} flex="1" minW="280px">
+                <ParticipantTable participants={mainstream} />
+              </StatsSection>
+              <StatsSection title={t('community.contrarian')} flex="1" minW="280px">
+                <ParticipantTable participants={contrarian} />
               </StatsSection>
             </HStack>
 
@@ -214,17 +253,29 @@ export function Page() {
                         <Table.Cell>
                           <Stack gap="1" minW="260px">
                             {isExpanded ? (
-                              <RankingEntries entries={ranking} songName={songName} />
+                              <RankingEntries
+                                entries={ranking}
+                                songName={songName}
+                                thumbnails={thumbnails}
+                              />
                             ) : (
                               <>
                                 <Text fontWeight="bold">{t('community.top_songs')}</Text>
-                                <RankingEntries entries={topRanking} songName={songName} />
+                                <RankingEntries
+                                  entries={topRanking}
+                                  songName={songName}
+                                  thumbnails={thumbnails}
+                                />
                                 {bottomRanking.length > 0 && (
                                   <>
                                     <Text mt="1" fontWeight="bold">
                                       {t('community.bottom_songs')}
                                     </Text>
-                                    <RankingEntries entries={bottomRanking} songName={songName} />
+                                    <RankingEntries
+                                      entries={bottomRanking}
+                                      songName={songName}
+                                      thumbnails={thumbnails}
+                                    />
                                   </>
                                 )}
                               </>
@@ -256,15 +307,6 @@ export function Page() {
                 </Table.Body>
               </Table.Root>
             </StatsSection>
-
-            <HStack gap="8" alignItems="start" flexWrap="wrap">
-              <StatsSection title={t('community.mainstream')} flex="1" minW="280px">
-                <ParticipantTable participants={mainstream} />
-              </StatsSection>
-              <StatsSection title={t('community.contrarian')} flex="1" minW="280px">
-                <ParticipantTable participants={contrarian} />
-              </StatsSection>
-            </HStack>
           </Stack>
         )}
       </Stack>
@@ -296,19 +338,43 @@ function StatsSection({
 
 function RankingEntries({
   entries,
-  songName
+  songName,
+  thumbnails
 }: {
   entries: [string, number][];
   songName: (id: string) => string;
+  thumbnails: Map<string, string | undefined>;
 }) {
   return (
     <HStack gap="3" alignItems="start" flexWrap="wrap">
       {entries.map(([songId, rank]) => (
         <HStack key={songId} gap="2">
           <Text color="fg.muted">{rank}.</Text>
-          <Text>{songName(songId)}</Text>
+          <SongLabel name={songName(songId)} thumbnail={thumbnails.get(songId)} />
         </HStack>
       ))}
+    </HStack>
+  );
+}
+
+function SongLabel({ name, thumbnail }: { name: string; thumbnail?: string }) {
+  return (
+    <HStack gap="2" alignItems="center" minW="0">
+      {thumbnail && (
+        <img
+          src={getAssetUrl(thumbnail)}
+          alt=""
+          aria-hidden="true"
+          style={{
+            width: '1.5rem',
+            height: '1.5rem',
+            objectFit: 'cover',
+            flexShrink: 0,
+            borderRadius: '0.15rem'
+          }}
+        />
+      )}
+      <Text>{name}</Text>
     </HStack>
   );
 }
