@@ -7,6 +7,7 @@ const SAVED_SUBMISSION_KEY = 'community-ranking-submission';
 export type CommunityRankingEntry = {
   songId: string;
   rank: number;
+  songTitle?: string;
 };
 
 export type SavedCommunitySubmission = {
@@ -117,11 +118,13 @@ export function saveCommunitySubmission(submission: SavedCommunitySubmission) {
 }
 
 export function getRankingFromOrder(order: string[][], songs: Song[]): CommunityRankingEntry[] {
+  const songNames = new Map(songs.map((song) => [song.id, song.name]));
   return order
     .flatMap((group, groupIndex) =>
       group.map((songId) => ({
         songId: `${songId}`,
-        rank: groupIndex + 1
+        rank: groupIndex + 1,
+        songTitle: songNames.get(`${songId}`) ?? ''
       }))
     )
     .filter((entry) => songs.some((song) => song.id === entry.songId));

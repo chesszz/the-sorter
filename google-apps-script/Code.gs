@@ -9,7 +9,8 @@ const HEADERS = [
   'browser_id_hash',
   'ranking_json',
   'created_at',
-  'updated_at'
+  'updated_at',
+  'ranking_summary'
 ];
 
 function setup() {
@@ -86,6 +87,7 @@ function saveSubmission_(body) {
   const displayName = String(body.displayName || '').trim();
   const browserId = String(body.browserId || '');
   const ranking = validateRanking_(body.ranking);
+  const rankingSummary = formatRankingSummary_(body.ranking, ranking);
   if (!displayName || displayName.length > 40) throw new Error('Enter a name up to 40 characters.');
   if (!browserId) throw new Error('Missing browser identifier.');
 
@@ -113,6 +115,7 @@ function saveSubmission_(body) {
           updateRow_(sheet, sameBrowser.rowNumber, {
             display_name: displayName,
             ranking_json: JSON.stringify(ranking),
+            ranking_summary: rankingSummary,
             updated_at: new Date()
           });
           sheet.getRange(sameBrowser.rowNumber, 4).setValue(tokenHash);
@@ -123,6 +126,7 @@ function saveSubmission_(body) {
       updateRow_(sheet, existing.rowNumber, {
         display_name: displayName,
         ranking_json: JSON.stringify(ranking),
+        ranking_summary: rankingSummary,
         updated_at: new Date()
       });
       return { ok: true, submissionId, editToken };
@@ -145,7 +149,8 @@ function saveSubmission_(body) {
       browserHash,
       JSON.stringify(ranking),
       new Date(),
-      new Date()
+      new Date(),
+      rankingSummary
     ]);
     return { ok: true, submissionId: newSubmissionId, editToken: newEditToken };
   } finally {
@@ -167,6 +172,20 @@ function validateRanking_(ranking) {
     seen[songId] = true;
     return { songId, rank };
   });
+}
+
+function formatRankingSummary_(submittedRanking, ranking) {
+  const titles = {};
+  if (Array.isArray(submittedRanking)) {
+    submittedRanking.forEach((entry) => {
+      const songId = String(entry.songId || '');
+      const title = String(entry.songTitle || '').trim();
+      if (songId && title) titles[songId] = title;
+    });
+  }
+  return ranking
+    .map((entry) => `${entry.rank}. ${titles[entry.songId] || '(title unavailable)'} (ID: ${entry.songId})`)
+    .join('\n');
 }
 
 function parseRanking_(rankingJson) {
@@ -351,6 +370,7 @@ function updateRow_(sheet, rowNumber, values) {
   if (values.display_name !== undefined) row[1] = values.display_name;
   if (values.ranking_json !== undefined) row[4] = values.ranking_json;
   if (values.updated_at !== undefined) row[6] = values.updated_at;
+  if (values.ranking_summary !== undefined) row[7] = values.ranking_summary;
   sheet.getRange(rowNumber, 1, 1, HEADERS.length).setValues([row]);
 }
 
