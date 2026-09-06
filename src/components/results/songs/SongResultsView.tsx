@@ -125,9 +125,13 @@ export function SongResultsView({
     setShowRenderingCanvas(true);
     toast?.({ description: t('toast.generating_screenshot') });
     try {
-      const domToBlob = await import('modern-screenshot').then((module) => module.domToBlob);
-      const resultsBox = document.getElementById('results');
       setTimestamp(new Date());
+      const domToBlobPromise = import('modern-screenshot').then((module) => module.domToBlob);
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+      const domToBlob = await domToBlobPromise;
+      const resultsBox = document.getElementById('results');
       if (resultsBox) {
         const blob = await domToBlob(resultsBox, {
           quality: 1,
@@ -429,10 +433,9 @@ export function SongResultsView({
                   </Box>
                 ))}
             </HStack>
-            <Text textAlign="end">
-              {t('results.generated_at')}: {timestamp.toLocaleString()}
-            </Text>
             <Text fontSize="sm" textAlign="end">
+              {t('results.generated_at')}: {timestamp.toLocaleString()}
+              <br />
               {t('results.generated_by')}
             </Text>
           </Stack>
