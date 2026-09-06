@@ -135,12 +135,15 @@ export function SongResultsView({
       const domToCanvas = await capturePromise;
       const resultsBox = document.getElementById('results');
       if (resultsBox) {
+        const style = getComputedStyle(resultsBox);
         const resultsRect = resultsBox.getBoundingClientRect();
         const contentBottom = Math.max(
           ...Array.from(resultsBox.children).map((child) => child.getBoundingClientRect().bottom)
         );
+        const verticalPadding =
+          Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom);
         const captureHeight = Math.ceil(
-          Math.max(resultsBox.scrollHeight, contentBottom - resultsRect.top)
+          Math.max(resultsBox.scrollHeight, contentBottom - resultsRect.top) - verticalPadding
         );
         const canvas = await domToCanvas(resultsBox, {
           width: resultsBox.scrollWidth,
@@ -150,10 +153,9 @@ export function SongResultsView({
           type: 'image/png',
           drawImageInterval: 0,
           font: false,
-          style: { margin: '0', transform: 'none' },
+          style: { margin: '0', paddingTop: '0', paddingBottom: '0', transform: 'none' },
           features: { removeControlCharacter: false, fixSvgXmlDecode: true }
         });
-        const style = getComputedStyle(resultsBox);
         const blob = await addScreenshotFooter(canvas, {
           attribution: t('results.generated_by'),
           timestamp: `${t('results.generated_at')}: ${generatedAt.toLocaleString()}`,
