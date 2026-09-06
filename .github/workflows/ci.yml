@@ -28,6 +28,8 @@ jobs:
             lint_report.json
       - name: Unit Test
         run: bun ci:test
+      - name: Apps Script regression tests
+        run: node google-apps-script/submissions.test.mjs
       - name: 'Report Coverage'
         # Set if: always() to also generate the report if tests are failing
         # Only works if you set `reportOnFailure: true` in your vite config as specified above
