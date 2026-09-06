@@ -26,13 +26,16 @@ export const getArtistName = (artist: string, locale: Locale | undefined) => {
 export const isEnglishLocale = (locale: Locale | undefined) =>
   locale?.toLowerCase().split('-')[0] === 'en';
 
+export const isJapaneseLocale = (locale: Locale | undefined) =>
+  locale?.toLowerCase().split('-')[0] === 'ja';
+
 export const getSongName = (
   name: string,
   englishName: string | undefined,
   locale: Locale | undefined
 ): string => {
   const language = locale?.toLowerCase().split('-')[0];
-  if (language && language !== 'ja' && englishName) return englishName;
+  if (language && !isJapaneseLocale(locale) && englishName) return englishName;
   return name;
 };
 
