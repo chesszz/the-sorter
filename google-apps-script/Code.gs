@@ -115,10 +115,9 @@ function saveSubmission_(body) {
             row.browser_id_hash === browserHash
         );
         if (sameBrowser) {
-          const existingRanking = parseRanking_(sameBrowser.ranking_json);
           updateRow_(sheet, sameBrowser.rowNumber, {
             display_name: displayName,
-            ranking_json: JSON.stringify(mergeRankings_(existingRanking, ranking)),
+            ranking_json: JSON.stringify(ranking),
             updated_at: new Date()
           });
           sheet.getRange(sameBrowser.rowNumber, 4).setValue(tokenHash);
@@ -126,11 +125,10 @@ function saveSubmission_(body) {
         }
         throw new Error('That edit link is invalid or expired.');
       }
-      const existingRanking = parseRanking_(existing.ranking_json);
       updateRow_(sheet, existing.rowNumber, {
         version,
         display_name: displayName,
-        ranking_json: JSON.stringify(mergeRankings_(existingRanking, ranking)),
+        ranking_json: JSON.stringify(ranking),
         updated_at: new Date()
       });
       return { ok: true, submissionId, editToken };
@@ -191,13 +189,6 @@ function parseRanking_(rankingJson) {
   } catch (_) {
     return [];
   }
-}
-
-function mergeRankings_(existingRanking, newRanking) {
-  const merged = {};
-  existingRanking.forEach((entry) => (merged[String(entry.songId)] = entry));
-  newRanking.forEach((entry) => (merged[String(entry.songId)] = entry));
-  return Object.keys(merged).map((songId) => merged[songId]);
 }
 
 function getStats_(version) {

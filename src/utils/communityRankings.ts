@@ -1,24 +1,6 @@
 import type { Song } from '~/types/songs';
 
 export const COMMUNITY_RANKING_VERSION = 'phantom-siita-v1';
-export const COMMUNITY_RANKING_SONG_IDS = [
-  '14',
-  '9',
-  '4',
-  '6',
-  '3',
-  '16',
-  '7',
-  '15',
-  '5',
-  '13',
-  '2',
-  '1',
-  '10',
-  '11',
-  '8',
-  '12'
-] as const;
 const API_URL = import.meta.env.PUBLIC_ENV__RANKINGS_API_URL?.trim() ?? '';
 const BROWSER_ID_KEY = 'community-ranking-browser-id';
 const SAVED_SUBMISSION_KEY = 'community-ranking-submission';

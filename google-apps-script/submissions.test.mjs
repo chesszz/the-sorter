@@ -27,7 +27,7 @@ const payload = {
   action: 'submit', requestId: 'request-1', version: 'phantom-siita-v1',
   browserId: 'browser-1', submissionId: 'browser-1:phantom-siita-v1',
   editToken: 'private-token', displayName: 'Tester',
-  ranking: [{ songId: '14', rank: 1 }, { songId: '9', rank: 2 }]
+  ranking: [{ songId: '14', rank: 1 }, { songId: '9', rank: 2 }, { songId: '4', rank: 3 }]
 };
 function submit(body) {
   const response = context.doPost({ parameter: { payload: JSON.stringify(body) } });
@@ -42,9 +42,17 @@ function submit(body) {
 }
 assert.equal(submit(payload).ok, true, 'first submission must create a row');
 assert.equal(rows.length, 1);
-assert.equal(submit({ ...payload, displayName: 'Updated' }).ok, true);
+assert.equal(submit({
+  ...payload,
+  displayName: 'Updated',
+  ranking: [{ songId: '14', rank: 2 }, { songId: '9', rank: 1 }]
+}).ok, true);
 assert.equal(rows.length, 1, 'retry must update, not duplicate');
 assert.equal(rows[0][2], 'Updated');
+assert.deepEqual(JSON.parse(rows[0][5]), [
+  { songId: '14', rank: 2 },
+  { songId: '9', rank: 1 }
+], 'an update must replace the previous ranking');
 assert.equal(submit({ ...payload, ranking: [] }).ok, false);
 assert.equal(submit({ ...payload, browserId: 'someone-else', editToken: 'wrong' }).ok, false);
 assert.equal(rows.length, 1);

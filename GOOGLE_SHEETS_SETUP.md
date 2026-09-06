@@ -32,4 +32,4 @@ The frontend submits through a hidden HTML form and reads stats through a JSONP 
 
 Each submission is one row containing the display name, song-list version, ordered song IDs, timestamps, and hashes of the edit token and browser ID. The raw edit token is returned only to the submitting browser. The stats endpoint returns aggregates and participant similarity scores, never edit tokens.
 
-The current version is `phantom-siita-v1` and contains 16 songs. If the song list changes, update `CONFIG.songIds` and create a new version before accepting new submissions.
+The current ranking namespace is `phantom-siita-v1`. A submission may contain any two or more songs. If songs are added, append their IDs to `CONFIG.songIds`; existing rows remain valid because missing songs are ignored in pairwise statistics. Users do not need to redo old rankings. Updating a submission replaces that user’s previous ranking with the newly submitted set of songs.
