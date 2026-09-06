@@ -9,6 +9,7 @@ import { FormLabel } from '~/components/ui/form-label';
 import {
   getRankingFromOrder,
   getSavedCommunitySubmission,
+  COMMUNITY_RANKING_SONG_IDS,
   isCommunityRankingsConfigured,
   saveCommunitySubmission,
   submitCommunityRanking,
@@ -36,7 +37,8 @@ export function CommunityRankingSubmission({
   }, []);
 
   const ranking = useMemo(() => (order ? getRankingFromOrder(order, songs) : []), [order, songs]);
-  const isComplete = ranking.length === songs.length && songs.length > 1;
+  const isFullCommunityList = songs.length === COMMUNITY_RANKING_SONG_IDS.length;
+  const isComplete = isFullCommunityList && ranking.length === COMMUNITY_RANKING_SONG_IDS.length;
 
   if (!isCommunityRankingsConfigured) return null;
 
@@ -95,7 +97,12 @@ export function CommunityRankingSubmission({
             {saved ? t('community.update') : t('community.submit')}
           </Button>
         </HStack>
-        {!isComplete && (
+        {!isFullCommunityList && (
+          <Text color="fg.muted" fontSize="sm">
+            {t('community.full_list_required')}
+          </Text>
+        )}
+        {isFullCommunityList && !isComplete && (
           <Text color="fg.muted" fontSize="sm">
             {t('community.complete_ranking')}
           </Text>

@@ -23,6 +23,7 @@
     "submitted": "Ranking submitted.",
     "updated": "Ranking updated.",
     "submit_error": "Could not submit the ranking.",
+    "full_list_required": "Select all songs to submit to the community ranking.",
     "complete_ranking": "Complete the full ranking before submitting.",
     "keep_edit_link": "Keep your edit link if you want to update this ranking later.",
     "copy_edit_link": "Copy edit link",
