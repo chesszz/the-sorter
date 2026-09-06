@@ -58,8 +58,8 @@
     "positive_correlations": "正の相関が強い楽曲",
     "negative_correlations": "負の相関が強い楽曲",
     "loved_this": "この曲が好きな人",
-    "also_liked_this": "好きな曲",
-    "did_not_like_this": "好きではない曲",
+    "also_liked_this": "これも好き",
+    "did_not_like_this": "これは苦手",
     "correlation": "相関係数",
     "mainstream": "最も平均的な意見",
     "contrarian": "最も個性的な意見"
