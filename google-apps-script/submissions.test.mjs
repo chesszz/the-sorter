@@ -11,7 +11,7 @@ const context = vm.createContext({
   }
 });
 vm.runInContext(readFileSync(new URL('./Code.gs', import.meta.url), 'utf8'), context);
-context.getSheet_ = () => ({ appendRow: (row) => rows.push(row) });
+context.getSheet_ = () => ({ appendRow: (row) => rows.push(row), deleteRow: (number) => rows.splice(number - 2, 1) });
 context.hash_ = (value) => `hashed:${value}`;
 context.readRows_ = () => rows.map((row, index) => ({
   rowNumber: index + 2, submission_id: row[0], version: row[1],
@@ -48,4 +48,10 @@ assert.equal(rows[0][2], 'Updated');
 assert.equal(submit({ ...payload, ranking: [] }).ok, false);
 assert.equal(submit({ ...payload, browserId: 'someone-else', editToken: 'wrong' }).ok, false);
 assert.equal(rows.length, 1);
-console.log('Passed: first submission, retry/update, validation error, invalid edit, callback contract.');
+assert.equal(submit({ ...payload, action: 'delete', editToken: 'wrong' }).ok, false);
+assert.equal(rows.length, 1, 'invalid token must not delete');
+assert.equal(submit({ ...payload, action: 'delete' }).ok, true);
+assert.equal(rows.length, 0);
+assert.equal(submit({ ...payload, action: 'delete' }).ok, true, 'retry deletion safely');
+assert.equal(submit(payload).ok, true, 'can submit again after deletion');
+console.log('Passed: submit, update, errors, authenticated deletion, retry and resubmit.');

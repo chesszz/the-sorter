@@ -8,6 +8,7 @@ import { Text } from '~/components/ui/text';
 import { FormLabel } from '~/components/ui/form-label';
 import {
   getRankingFromOrder,
+  deleteCommunityRanking,
   getSavedCommunitySubmission,
   COMMUNITY_RANKING_SONG_IDS,
   isCommunityRankingsConfigured,
@@ -61,6 +62,22 @@ export function CommunityRankingSubmission({
     }
   };
 
+  const deleteRanking = async () => {
+    if (!saved || !window.confirm(t('community.delete_confirm'))) return;
+    setLoading(true);
+    setError(undefined);
+    setStatus(undefined);
+    try {
+      await deleteCommunityRanking(saved);
+      setSaved(undefined);
+      setStatus(t('community.deleted'));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : t('community.delete_error'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const copyEditLink = async () => {
     if (!saved) return;
     await navigator.clipboard.writeText(saved.editUrl);
@@ -92,7 +109,7 @@ export function CommunityRankingSubmission({
           <Button
             onClick={() => void submit()}
             loading={loading}
-            disabled={!isComplete || displayName.trim().length < 1}
+            disabled={loading || !isComplete || displayName.trim().length < 1}
           >
             {saved ? t('community.update') : t('community.submit')}
           </Button>
@@ -124,6 +141,14 @@ export function CommunityRankingSubmission({
             </Text>
             <Button size="xs" variant="outline" onClick={() => void copyEditLink()}>
               {t('community.copy_edit_link')}
+            </Button>
+            <Button
+              size="xs"
+              variant="outline"
+              disabled={loading}
+              onClick={() => void deleteRanking()}
+            >
+              {t('community.delete')}
             </Button>
           </HStack>
         )}

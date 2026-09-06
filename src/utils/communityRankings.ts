@@ -99,6 +99,11 @@ function getBrowserId() {
   return id;
 }
 
+export function getCommunityEditUrl(submissionId: string, editToken: string) {
+  const base = (import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '');
+  return `${window.location.origin}${base}/songs#community-edit=${encodeURIComponent(submissionId)}.${encodeURIComponent(editToken)}`;
+}
+
 export function getSavedCommunitySubmission(): SavedCommunitySubmission | undefined {
   if (typeof window === 'undefined') return undefined;
 
@@ -114,12 +119,14 @@ export function getSavedCommunitySubmission(): SavedCommunitySubmission | undefi
       submissionId,
       editToken,
       displayName: '',
-      editUrl: window.location.href
+      editUrl: getCommunityEditUrl(submissionId, editToken)
     };
   }
 
   try {
-    return JSON.parse(value) as SavedCommunitySubmission;
+    const saved = JSON.parse(value) as SavedCommunitySubmission;
+    saved.editUrl = getCommunityEditUrl(saved.submissionId, saved.editToken);
+    return saved;
   } catch {
     window.localStorage.removeItem(SAVED_SUBMISSION_KEY);
     return undefined;
@@ -225,13 +232,25 @@ export async function submitCommunityRanking(
     editToken
   });
 
-  const editUrl = `${window.location.origin}${import.meta.env.BASE_URL}songs#community-edit=${encodeURIComponent(submissionId)}.${encodeURIComponent(editToken)}`;
+  const editUrl = getCommunityEditUrl(submissionId, editToken);
   return {
     submissionId,
     editToken,
     displayName,
     editUrl
   } satisfies SavedCommunitySubmission;
+}
+
+export async function deleteCommunityRanking(saved: SavedCommunitySubmission) {
+  await submitWithForm({
+    action: 'delete',
+    submissionId: saved.submissionId,
+    editToken: saved.editToken
+  });
+  window.localStorage.removeItem(SAVED_SUBMISSION_KEY);
+  if (window.location.hash.startsWith('#community-edit=')) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
 }
 
 export async function fetchCommunityStats() {

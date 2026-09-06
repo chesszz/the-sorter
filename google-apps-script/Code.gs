@@ -51,6 +51,9 @@ function doPost(event) {
         ? event.parameter.payload
         : event.postData.contents || '{}';
     const body = JSON.parse(bodyText);
+    if (body.action === 'delete') {
+      return postMessage_(Object.assign(deleteSubmission_(body), { requestId: String(body.requestId || '') }));
+    }
     if (body.action === 'submit') {
       return postMessage_(Object.assign(saveSubmission_(body), { requestId: String(body.requestId || '') }));
     }
@@ -61,6 +64,24 @@ function doPost(event) {
       requestId = String(JSON.parse(event.parameter?.payload || event.postData?.contents || '{}').requestId || '');
     } catch (_) {}
     return postMessage_({ ok: false, message: error.message || 'Request failed.', requestId });
+  }
+}
+
+function deleteSubmission_(body) {
+  const submissionId = String(body.submissionId || '');
+  const editToken = String(body.editToken || '');
+  if (!submissionId || !editToken) throw new Error('Your edit link is required to delete this ranking.');
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sheet = getSheet_();
+    const existing = readRows_(sheet).find((row) => row.submission_id === submissionId);
+    if (!existing) return { ok: true };
+    if (existing.edit_token_hash !== hash_(editToken)) throw new Error('That edit link is invalid or expired.');
+    sheet.deleteRow(existing.rowNumber);
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
   }
 }
 

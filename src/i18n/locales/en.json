@@ -13,6 +13,10 @@
   "artist": "Artist",
   "thumbnail": "Thumbnail",
   "community": {
+    "delete": "Delete my ranking",
+    "delete_confirm": "Delete your submitted community ranking? This cannot be undone. Your local sorting results will stay on this device.",
+    "deleted": "Your community ranking was deleted.",
+    "delete_error": "Could not delete your ranking.",
     "stats": "Community Stats",
     "submit_title": "Submit Your Ranking",
     "submit_description": "Add your ranking to the anonymous community results. Your edit link is saved in this browser.",
