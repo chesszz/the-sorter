@@ -71,9 +71,11 @@ export function Page() {
   const oneSidedMatchups = [...(stats?.matchups ?? [])]
     .filter((matchup) => matchup.total > 0)
     .toSorted((a, b) => {
-      const aSplit = Math.max(a.leftWins, a.rightWins) / a.total;
-      const bSplit = Math.max(b.leftWins, b.rightWins) / b.total;
-      return bSplit - aSplit;
+      const aMargin = Math.abs(a.leftWins - a.rightWins) / a.total;
+      const bMargin = Math.abs(b.leftWins - b.rightWins) / b.total;
+      const marginDifference = bMargin - aMargin;
+      if (marginDifference !== 0) return marginDifference;
+      return Math.max(b.leftWins, b.rightWins) - Math.max(a.leftWins, a.rightWins);
     })
     .slice(0, 10);
   const positiveCorrelations = [...(stats?.correlations ?? [])]
