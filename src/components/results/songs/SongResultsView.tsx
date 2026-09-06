@@ -139,7 +139,7 @@ export function SongResultsView({
           type: 'image/png',
           drawImageInterval: 0,
           font: false,
-          features: { removeControlCharacter: false, fixSvgXmlDecode: false }
+          features: { removeControlCharacter: false, fixSvgXmlDecode: true }
         });
         screenshotCache.current = { key: cacheKey, blob };
         return blob;
@@ -433,12 +433,21 @@ export function SongResultsView({
                   </Box>
                 ))}
             </HStack>
-            <HStack justifyContent="space-between" width="full" fontSize="sm">
-              <Text>{t('results.generated_by')}</Text>
-              <Text textAlign="end">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                fontSize: '14px',
+                lineHeight: '1.5'
+              }}
+            >
+              <span>{t('results.generated_by')}</span>
+              <span style={{ textAlign: 'right' }}>
                 {t('results.generated_at')}: {timestamp.toLocaleString()}
-              </Text>
-            </HStack>
+              </span>
+            </div>
           </Stack>
         </Box>
       )}
