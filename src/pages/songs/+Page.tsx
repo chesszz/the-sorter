@@ -664,6 +664,7 @@ export function Page() {
               <Suspense>
                 <SongResultsView
                   songsData={songs}
+                  titlePrefix="Phantom Siita"
                   performanceMeta={
                     isPerformanceMode && performanceMeta ? performanceMeta : undefined
                   }
