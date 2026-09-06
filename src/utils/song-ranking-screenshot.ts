@@ -143,12 +143,13 @@ export async function renderSongRankingScreenshot(options: ScreenshotOptions): P
     const titleWidth = columnWidth - rankWidth - thumbnailWidth;
 
     context.fillStyle = '#68656f';
-    context.font = '14px sans-serif';
-    context.textAlign = 'center';
+    context.font = 'bold 16px sans-serif';
+    context.textAlign = 'left';
     context.textBaseline = 'middle';
     const headerY = tableTop + HEADER_HEIGHT / 2;
-    context.fillText(options.labels.ranking, x + rankWidth / 2, headerY);
-    context.fillText(options.labels.title, x + rankWidth + titleWidth / 2, headerY);
+    context.fillText(options.labels.ranking, x + 20, headerY);
+    context.fillText(options.labels.title, x + rankWidth + 20, headerY);
+    context.textAlign = 'center';
     context.fillText(
       options.labels.thumbnail,
       x + rankWidth + titleWidth + thumbnailWidth / 2,

@@ -126,7 +126,7 @@ export function SongResultsView({
     try {
       const generatedAt = new Date();
       setTimestamp(generatedAt);
-      const style = getComputedStyle(document.body);
+      const isDarkMode = document.documentElement.classList.contains('dark');
       const blob = await renderSongRankingScreenshot({
         title,
         description,
@@ -140,8 +140,8 @@ export function SongResultsView({
           timestamp: `${t('results.generated_at')}: ${generatedAt.toLocaleString()}`
         },
         colors: {
-          background: style.backgroundColor,
-          text: style.color
+          background: isDarkMode ? '#19171b' : '#fff0ea',
+          text: isDarkMode ? '#ffe8e8' : '#050406'
         }
       });
       screenshotCache.current = { key: cacheKey, blob };
