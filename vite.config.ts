@@ -22,7 +22,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 export default defineConfig({
   define: {
     'import.meta.env.PUBLIC_ENV__APP_VERSION': JSON.stringify(appVersion),
-    'import.meta.env.PUBLIC_ENV__BUILD_TIMESTAMP': JSON.stringify(buildTimestamp)
+    'import.meta.env.PUBLIC_ENV__BUILD_TIMESTAMP': JSON.stringify(buildTimestamp),
+    'import.meta.env.PUBLIC_ENV__RANKINGS_API_URL': JSON.stringify(
+      process.env.PUBLIC_ENV__RANKINGS_API_URL ?? ''
+    )
   },
   ssr: {
     // noExternal: ['react']

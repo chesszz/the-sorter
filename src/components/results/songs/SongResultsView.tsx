@@ -26,6 +26,7 @@ import type { GuessResult } from '~/hooks/useHeardleState';
 import type { PerformanceSortMeta } from '~/types/performance-sort';
 import { PerformanceOrderView } from './PerformanceOrderView';
 import { getFullPerformanceName } from '~/utils/names';
+import { CommunityRankingSubmission } from '~/components/community/CommunityRankingSubmission';
 
 export function SongResultsView({
   titlePrefix,
@@ -268,6 +269,10 @@ export function SongResultsView({
             </HStack>
           )}
         </Stack>
+
+        {!readOnly && currentTab !== 'performance-order' && (
+          <CommunityRankingSubmission songs={songsData} order={order} />
+        )}
 
         <Tabs.Root
           lazyMount

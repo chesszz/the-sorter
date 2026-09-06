@@ -1,0 +1,213 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Box, HStack, Stack } from 'styled-system/jsx';
+import { Metadata } from '~/components/layout/Metadata';
+import { Heading } from '~/components/ui/heading';
+import { Text } from '~/components/ui/text';
+import { Table } from '~/components/ui/table';
+import { useSongData } from '~/hooks/useSongData';
+import { getSongName } from '~/utils/names';
+import {
+  fetchCommunityStats,
+  isCommunityRankingsConfigured,
+  type CommunityStats
+} from '~/utils/communityRankings';
+
+function formatPercent(value: number) {
+  return `${Math.round(value)}%`;
+}
+
+function formatCorrelation(value: number) {
+  return value.toFixed(2);
+}
+
+export function Page() {
+  const { t, i18n } = useTranslation();
+  const songs = useSongData();
+  const [stats, setStats] = useState<CommunityStats>();
+  const [error, setError] = useState<string>();
+  const [loading, setLoading] = useState(true);
+  const names = useMemo(
+    () =>
+      new Map(
+        songs.map((song) => [song.id, getSongName(song.name, song.englishName, i18n.language)])
+      ),
+    [songs, i18n.language]
+  );
+
+  useEffect(() => {
+    if (!isCommunityRankingsConfigured) {
+      setLoading(false);
+      return;
+    }
+    fetchCommunityStats()
+      .then((data) => {
+        setStats(data);
+        setLoading(false);
+        return data;
+      })
+      .catch((reason: unknown) => {
+        setError(reason instanceof Error ? reason.message : t('community.stats_error'));
+        setLoading(false);
+      });
+  }, [t]);
+
+  const songName = (id: string) => names.get(id) ?? id;
+  const divisiveMatchups = [...(stats?.matchups ?? [])]
+    .filter((matchup) => matchup.total > 0)
+    .toSorted((a, b) => {
+      const aSplit = Math.max(a.leftWins, a.rightWins) / a.total;
+      const bSplit = Math.max(b.leftWins, b.rightWins) / b.total;
+      return aSplit - bSplit;
+    })
+    .slice(0, 10);
+  const correlations = [...(stats?.correlations ?? [])]
+    .toSorted((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation))
+    .slice(0, 10);
+  const mainstream = [...(stats?.participants ?? [])]
+    .toSorted((a, b) => b.similarity - a.similarity)
+    .slice(0, 10);
+  const contrarian = [...(stats?.participants ?? [])]
+    .toSorted((a, b) => a.similarity - b.similarity)
+    .slice(0, 10);
+
+  return (
+    <>
+      <Metadata title={t('community.stats_title')} helmet />
+      <Stack gap="6" alignItems="center" w="full">
+        <Stack gap="1" alignItems="center">
+          <Heading fontSize="3xl">{t('community.stats_title')}</Heading>
+          <Text color="fg.muted">
+            {stats?.submissionCount ?? 0} {t('community.submissions')}
+          </Text>
+        </Stack>
+        {!isCommunityRankingsConfigured && <Text>{t('community.stats_not_configured')}</Text>}
+        {loading && <Text>{t('community.loading')}</Text>}
+        {error && (
+          <Text role="alert" color="red.600">
+            {error}
+          </Text>
+        )}
+        {stats && (
+          <Stack gap="8" w="full">
+            <StatsSection title={t('community.consensus')}>
+              <Table.Root size="sm">
+                <Table.Head>
+                  <Table.Row>
+                    <Table.Header>{t('community.rank')}</Table.Header>
+                    <Table.Header>{t('community.song')}</Table.Header>
+                    <Table.Header>{t('community.average_rank')}</Table.Header>
+                    <Table.Header>{t('community.first_place')}</Table.Header>
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {[...stats.songs]
+                    .toSorted((a, b) => a.averageRank - b.averageRank)
+                    .map((song, index) => (
+                      <Table.Row key={song.songId}>
+                        <Table.Cell>{index + 1}</Table.Cell>
+                        <Table.Cell>{songName(song.songId)}</Table.Cell>
+                        <Table.Cell>{song.averageRank.toFixed(2)}</Table.Cell>
+                        <Table.Cell>{formatPercent(song.firstPlacePercent)}</Table.Cell>
+                      </Table.Row>
+                    ))}
+                </Table.Body>
+              </Table.Root>
+            </StatsSection>
+
+            <StatsSection title={t('community.matchups')}>
+              <Table.Root size="sm">
+                <Table.Head>
+                  <Table.Row>
+                    <Table.Header>{t('community.song')}</Table.Header>
+                    <Table.Header>{t('community.song')}</Table.Header>
+                    <Table.Header>{t('community.split')}</Table.Header>
+                    <Table.Header>{t('community.submissions')}</Table.Header>
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {divisiveMatchups.map((matchup) => (
+                    <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
+                      <Table.Cell>{songName(matchup.leftSongId)}</Table.Cell>
+                      <Table.Cell>{songName(matchup.rightSongId)}</Table.Cell>
+                      <Table.Cell>
+                        {matchup.leftWins}–{matchup.rightWins}
+                      </Table.Cell>
+                      <Table.Cell>{matchup.total}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
+            </StatsSection>
+
+            <StatsSection title={t('community.correlations')}>
+              <Table.Root size="sm">
+                <Table.Head>
+                  <Table.Row>
+                    <Table.Header>{t('community.song')}</Table.Header>
+                    <Table.Header>{t('community.song')}</Table.Header>
+                    <Table.Header>{t('community.correlation')}</Table.Header>
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {correlations.map((pair) => (
+                    <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
+                      <Table.Cell>{songName(pair.leftSongId)}</Table.Cell>
+                      <Table.Cell>{songName(pair.rightSongId)}</Table.Cell>
+                      <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
+            </StatsSection>
+
+            <HStack gap="8" alignItems="start" flexWrap="wrap">
+              <StatsSection title={t('community.mainstream')} flex="1" minW="280px">
+                <ParticipantTable participants={mainstream} />
+              </StatsSection>
+              <StatsSection title={t('community.contrarian')} flex="1" minW="280px">
+                <ParticipantTable participants={contrarian} />
+              </StatsSection>
+            </HStack>
+          </Stack>
+        )}
+      </Stack>
+    </>
+  );
+}
+
+function StatsSection({
+  title,
+  children,
+  ...props
+}: { title: string; children: React.ReactNode } & Record<string, unknown>) {
+  return (
+    <Stack gap="2" {...props}>
+      <Heading fontSize="xl">{title}</Heading>
+      <Box w="full" overflowX="auto">
+        {children}
+      </Box>
+    </Stack>
+  );
+}
+
+function ParticipantTable({ participants }: { participants: CommunityStats['participants'] }) {
+  return (
+    <Table.Root size="sm">
+      <Table.Head>
+        <Table.Row>
+          <Table.Header>Name</Table.Header>
+          <Table.Header>Similarity</Table.Header>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        {participants.map((participant, index) => (
+          <Table.Row key={`${participant.displayName}-${index}`}>
+            <Table.Cell>{participant.displayName}</Table.Cell>
+            <Table.Cell>{Math.round(participant.similarity)}%</Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
+  );
+}
