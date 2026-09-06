@@ -1,12 +1,10 @@
 const CONFIG = {
   sheetName: 'submissions',
-  defaultVersion: 'phantom-siita-v1',
   songIds: ['14', '9', '4', '6', '3', '16', '7', '15', '5', '13', '2', '1', '10', '11', '8', '12']
 };
 
 const HEADERS = [
   'submission_id',
-  'version',
   'display_name',
   'edit_token_hash',
   'browser_id_hash',
@@ -30,7 +28,7 @@ function doGet(event) {
       return json_(
         {
           ok: true,
-          data: getStats_(event.parameter.version || CONFIG.defaultVersion)
+          data: getStats_()
         },
         event.parameter.callback
       );
@@ -86,10 +84,9 @@ function deleteSubmission_(body) {
 }
 
 function saveSubmission_(body) {
-  const version = String(body.version || CONFIG.defaultVersion);
   const displayName = String(body.displayName || '').trim();
   const browserId = String(body.browserId || '');
-  const ranking = validateRanking_(body.ranking, version);
+  const ranking = validateRanking_(body.ranking);
   if (!displayName || displayName.length > 40) throw new Error('Enter a name up to 40 characters.');
   if (!browserId) throw new Error('Missing browser identifier.');
 
@@ -111,7 +108,6 @@ function saveSubmission_(body) {
         const sameBrowser = rows.find(
           (row) =>
             row.submission_id === submissionId &&
-            row.version === version &&
             row.browser_id_hash === browserHash
         );
         if (sameBrowser) {
@@ -126,7 +122,6 @@ function saveSubmission_(body) {
         throw new Error('That edit link is invalid or expired.');
       }
       updateRow_(sheet, existing.rowNumber, {
-        version,
         display_name: displayName,
         ranking_json: JSON.stringify(ranking),
         updated_at: new Date()
@@ -134,21 +129,18 @@ function saveSubmission_(body) {
       return { ok: true, submissionId, editToken };
     }
 
-    const duplicate = rows.find(
-      (row) => row.version === version && row.browser_id_hash === browserHash
-    );
+    const duplicate = rows.find((row) => row.browser_id_hash === browserHash);
     if (duplicate) {
       throw new Error(
         'This browser already has a ranking for this song list. Use your saved edit link to update it.'
       );
     }
 
-    const newSubmissionId = submissionId || `${browserId}:${version}`;
+    const newSubmissionId = submissionId || browserId;
     const newEditToken =
       editToken || Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
     sheet.appendRow([
       newSubmissionId,
-      version,
       displayName,
       hash_(newEditToken),
       browserHash,
@@ -162,9 +154,7 @@ function saveSubmission_(body) {
   }
 }
 
-function validateRanking_(ranking, version) {
-  if (version !== CONFIG.defaultVersion)
-    throw new Error('This song list version is not supported.');
+function validateRanking_(ranking) {
   if (!Array.isArray(ranking) || ranking.length < 2 || ranking.length > CONFIG.songIds.length) {
     throw new Error('Rank at least two songs.');
   }
@@ -191,8 +181,8 @@ function parseRanking_(rankingJson) {
   }
 }
 
-function getStats_(version) {
-  const rows = readRows_(getSheet_()).filter((row) => row.version === version);
+function getStats_() {
+  const rows = readRows_(getSheet_());
   const songScores = {};
   CONFIG.songIds.forEach((id) => (songScores[id] = []));
   const participants = [];
@@ -284,7 +274,6 @@ function getStats_(version) {
   });
 
   return {
-    version,
     submissionCount: rows.length,
     songs,
     matchups,
@@ -305,8 +294,22 @@ function getSheet_() {
   if (sheet.getLastRow() === 0) {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     sheet.setFrozenRows(1);
+  } else {
+    migrateVersionedSheet_(sheet);
   }
   return sheet;
+}
+
+function migrateVersionedSheet_(sheet) {
+  const headerCount = Math.max(sheet.getLastColumn(), HEADERS.length);
+  const headers = sheet.getRange(1, 1, 1, headerCount).getValues()[0].map(String);
+  if (headers[0] === 'submission_id' && headers[1] === 'version') {
+    sheet.deleteColumn(2);
+  }
+  const currentHeaders = sheet.getRange(1, 1, 1, HEADERS.length).getValues()[0].map(String);
+  if (currentHeaders.join('|') !== HEADERS.join('|')) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  }
 }
 
 function readRows_(sheet) {
@@ -315,20 +318,18 @@ function readRows_(sheet) {
   return values.map((row, index) => ({
     rowNumber: index + 2,
     submission_id: String(row[0]),
-    version: String(row[1]),
-    display_name: String(row[2]),
-    edit_token_hash: String(row[3]),
-    browser_id_hash: String(row[4]),
-    ranking_json: String(row[5])
+    display_name: String(row[1]),
+    edit_token_hash: String(row[2]),
+    browser_id_hash: String(row[3]),
+    ranking_json: String(row[4])
   }));
 }
 
 function updateRow_(sheet, rowNumber, values) {
   const row = sheet.getRange(rowNumber, 1, 1, HEADERS.length).getValues()[0];
-  if (values.version !== undefined) row[1] = values.version;
-  if (values.display_name !== undefined) row[2] = values.display_name;
-  if (values.ranking_json !== undefined) row[5] = values.ranking_json;
-  if (values.updated_at !== undefined) row[7] = values.updated_at;
+  if (values.display_name !== undefined) row[1] = values.display_name;
+  if (values.ranking_json !== undefined) row[4] = values.ranking_json;
+  if (values.updated_at !== undefined) row[6] = values.updated_at;
   sheet.getRange(rowNumber, 1, 1, HEADERS.length).setValues([row]);
 }
 

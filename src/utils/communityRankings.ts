@@ -1,6 +1,5 @@
 import type { Song } from '~/types/songs';
 
-export const COMMUNITY_RANKING_VERSION = 'phantom-siita-v1';
 const API_URL = import.meta.env.PUBLIC_ENV__RANKINGS_API_URL?.trim() ?? '';
 const BROWSER_ID_KEY = 'community-ranking-browser-id';
 const SAVED_SUBMISSION_KEY = 'community-ranking-submission';
@@ -47,7 +46,6 @@ export type CommunityParticipantStats = {
 };
 
 export type CommunityStats = {
-  version: string;
   submissionCount: number;
   songs: CommunitySongStats[];
   matchups: CommunityMatchupStats[];
@@ -200,11 +198,10 @@ export async function submitCommunityRanking(
   saved?: SavedCommunitySubmission
 ) {
   const browserId = getBrowserId();
-  const submissionId = saved?.submissionId ?? `${browserId}:${COMMUNITY_RANKING_VERSION}`;
+  const submissionId = saved?.submissionId ?? browserId;
   const editToken = saved?.editToken ?? createToken();
   await submitWithForm({
     action: 'submit',
-    version: COMMUNITY_RANKING_VERSION,
     displayName,
     browserId,
     ranking,
@@ -240,7 +237,6 @@ export async function fetchCommunityStats() {
 
   const url = new URL(API_URL);
   url.searchParams.set('action', 'stats');
-  url.searchParams.set('version', COMMUNITY_RANKING_VERSION);
   return new Promise<CommunityStats>((resolve, reject) => {
     const callbackName = `communityStats_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const script = document.createElement('script');
