@@ -6,6 +6,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { FormLabel } from '~/components/ui/form-label';
+import { Link } from '~/components/ui/link';
 import {
   getRankingFromOrder,
   deleteCommunityRanking,
@@ -27,6 +28,7 @@ export function CommunityRankingSubmission({
   const [displayName, setDisplayName] = useState('');
   const [saved, setSaved] = useState<SavedCommunitySubmission>();
   const [status, setStatus] = useState<string>();
+  const [showStatsLink, setShowStatsLink] = useState(false);
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
@@ -46,12 +48,14 @@ export function CommunityRankingSubmission({
     if (!isComplete || displayName.trim().length < 1) return;
     setLoading(true);
     setStatus(undefined);
+    setShowStatsLink(false);
     setError(undefined);
     try {
       const submission = await submitCommunityRanking(displayName.trim(), ranking, saved);
       saveCommunitySubmission(submission);
       setSaved(submission);
       setStatus(saved ? t('community.updated') : t('community.submitted'));
+      setShowStatsLink(true);
     } catch (submissionError) {
       setError(
         submissionError instanceof Error ? submissionError.message : t('community.submit_error')
@@ -66,6 +70,7 @@ export function CommunityRankingSubmission({
     setLoading(true);
     setError(undefined);
     setStatus(undefined);
+    setShowStatsLink(false);
     try {
       await deleteCommunityRanking(saved);
       setSaved(undefined);
@@ -119,9 +124,20 @@ export function CommunityRankingSubmission({
           </Text>
         )}
         {status && (
-          <Text role="status" color="green.600" fontSize="sm">
-            {status}
-          </Text>
+          <Stack gap="1">
+            <Text role="status" color="green.600" fontSize="sm">
+              {status}
+            </Text>
+            {showStatsLink && (
+              <Link
+                href={`${import.meta.env.BASE_URL.replace(/\/+$/, '')}/stats`}
+                textDecoration="underline"
+                fontWeight="bold"
+              >
+                {t('community.view_stats')}
+              </Link>
+            )}
+          </Stack>
         )}
         {error && (
           <Text role="alert" color="red.600" fontSize="sm">

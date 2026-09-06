@@ -22,25 +22,47 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }, [children]);
 
   function NavLinks() {
+    const songsPath = join(import.meta.env.BASE_URL, '/songs');
+    const statsPath = join(import.meta.env.BASE_URL, '/stats');
+    const isSongsPage = currentPath === songsPath;
+    const isStatsPage = currentPath === statsPath;
+
     return (
-      <>
+      <HStack
+        gap="1"
+        border="1px solid"
+        borderColor="border.default"
+        rounded="l1"
+        p="1"
+        bgColor="bg.subtle"
+      >
         <Link
-          href={join(import.meta.env.BASE_URL, '/songs')}
-          data-active={currentPath === join(import.meta.env.BASE_URL, '/songs') ? true : undefined}
+          href={songsPath}
+          data-active={isSongsPage ? true : undefined}
+          aria-current={isSongsPage ? 'page' : undefined}
           onClick={() => setIsDrawerOpen(false)}
-          _active={{ fontWeight: 'bold' }}
+          rounded="l1"
+          py="1.5"
+          px="3"
+          _active={{ backgroundColor: 'bg.muted', fontWeight: 'bold' }}
+          _hover={{ backgroundColor: 'bg.muted' }}
         >
           {t(`navigation.songs`)}
         </Link>
         <Link
-          href={join(import.meta.env.BASE_URL, '/stats')}
-          data-active={currentPath === join(import.meta.env.BASE_URL, '/stats') ? true : undefined}
+          href={statsPath}
+          data-active={isStatsPage ? true : undefined}
+          aria-current={isStatsPage ? 'page' : undefined}
           onClick={() => setIsDrawerOpen(false)}
-          _active={{ fontWeight: 'bold' }}
+          rounded="l1"
+          py="1.5"
+          px="3"
+          _active={{ backgroundColor: 'bg.muted', fontWeight: 'bold' }}
+          _hover={{ backgroundColor: 'bg.muted' }}
         >
           {t('community.stats')}
         </Link>
-      </>
+      </HStack>
     );
   }
 

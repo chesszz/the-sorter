@@ -5,6 +5,7 @@ import { Metadata } from '~/components/layout/Metadata';
 import { Heading } from '~/components/ui/heading';
 import { Text } from '~/components/ui/text';
 import { Table } from '~/components/ui/table';
+import { Button } from '~/components/ui/button';
 import { useSongData } from '~/hooks/useSongData';
 import { getSongName } from '~/utils/names';
 import {
@@ -27,6 +28,7 @@ export function Page() {
   const [stats, setStats] = useState<CommunityStats>();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(true);
+  const [showAllIndividualRankings, setShowAllIndividualRankings] = useState(false);
   const names = useMemo(
     () =>
       new Map(
@@ -70,6 +72,14 @@ export function Page() {
   const contrarian = [...(stats?.participants ?? [])]
     .toSorted((a, b) => a.similarity - b.similarity)
     .slice(0, 10);
+  const individualParticipants = (() => {
+    const ranked = (stats?.participants ?? [])
+      .map((participant, index) => ({ participant, index }))
+      .toSorted((a, b) => b.participant.similarity - a.participant.similarity);
+    if (showAllIndividualRankings) return ranked;
+    const featured = [...ranked.slice(0, 5), ...ranked.slice(-5)];
+    return Array.from(new Map(featured.map((item) => [item.index, item])).values());
+  })();
 
   return (
     <>
@@ -123,7 +133,22 @@ export function Page() {
               </Table.Root>
             </StatsSection>
 
-            <StatsSection title={t('community.individual_rankings')}>
+            <StatsSection
+              title={t('community.individual_rankings')}
+              action={
+                stats.participants.length > 10 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowAllIndividualRankings((showAll) => !showAll)}
+                  >
+                    {showAllIndividualRankings
+                      ? t('community.show_fewer_rankings')
+                      : t('community.show_all_rankings')}
+                  </Button>
+                )
+              }
+            >
               <Table.Root size="sm">
                 <Table.Head>
                   <Table.Row>
@@ -136,7 +161,7 @@ export function Page() {
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                  {stats.participants.map((participant, index) => (
+                  {individualParticipants.map(({ participant, index }) => (
                     <Table.Row key={`${participant.displayName}-${index}`}>
                       <Table.Cell style={{ whiteSpace: 'nowrap' }}>
                         {participant.displayName}
@@ -216,11 +241,18 @@ export function Page() {
 function StatsSection({
   title,
   children,
+  action,
   ...props
-}: { title: string; children: React.ReactNode } & Record<string, unknown>) {
+}: { title: string; children: React.ReactNode; action?: React.ReactNode } & Record<
+  string,
+  unknown
+>) {
   return (
     <Stack gap="2" {...props}>
-      <Heading fontSize="xl">{title}</Heading>
+      <HStack gap="3" justifyContent="space-between" alignItems="center">
+        <Heading fontSize="xl">{title}</Heading>
+        {action}
+      </HStack>
       <Box w="full" overflowX="auto">
         {children}
       </Box>
