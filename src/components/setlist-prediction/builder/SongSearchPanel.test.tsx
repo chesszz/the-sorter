@@ -63,7 +63,7 @@ describe('SongSearchPanel single click select', () => {
     const input = screen.getByPlaceholderText(/search/i);
     await user.type(input, 'Alpha');
 
-    const songItem = await screen.findByText('Test Song Alpha');
+    const [songItem] = await screen.findAllByText('Test Song Alpha');
     await user.click(songItem);
 
     expect(onAddSong).toHaveBeenCalledWith('song-1', 'Test Song Alpha');
@@ -76,7 +76,7 @@ describe('SongSearchPanel single click select', () => {
     const input = screen.getByPlaceholderText(/search/i);
     await user.type(input, 'Alpha');
 
-    const songItem = await screen.findByText('Test Song Alpha');
+    const [songItem] = await screen.findAllByText('Test Song Alpha');
     await user.click(songItem);
 
     expect(onAddSong).not.toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe('SongSearchPanel single click select', () => {
     const input = screen.getByPlaceholderText(/search/i);
     await user.type(input, 'Alpha');
 
-    const songItem = await screen.findByText('Test Song Alpha');
+    const [songItem] = await screen.findAllByText('Test Song Alpha');
     await user.dblClick(songItem);
 
     expect(onAddSong).toHaveBeenCalledWith('song-1', 'Test Song Alpha');
