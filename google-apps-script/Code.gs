@@ -22,6 +22,11 @@ function setup() {
   sheet.setFrozenRows(1);
 }
 
+// Run this once from the Apps Script editor to authorize fetching songs.json.
+function authorizeCatalogAccess() {
+  getSongTitles_();
+}
+
 function doGet(event) {
   try {
     const action = event.parameter.action || 'stats';
