@@ -195,7 +195,8 @@ export function Page() {
                   pairs={positiveCorrelations}
                   songName={songName}
                   thumbnails={thumbnails}
-                  songLabel={t('community.song')}
+                  leftLabel={t('community.loved_this')}
+                  rightLabel={t('community.also_liked_this')}
                   correlationLabel={t('community.correlation')}
                 />
               </StatsSection>
@@ -209,7 +210,8 @@ export function Page() {
                   pairs={negativeCorrelations}
                   songName={songName}
                   thumbnails={thumbnails}
-                  songLabel={t('community.song')}
+                  leftLabel={t('community.loved_this')}
+                  rightLabel={t('community.did_not_like_this')}
                   correlationLabel={t('community.correlation')}
                 />
               </StatsSection>
@@ -452,21 +454,23 @@ function CorrelationTable({
   pairs,
   songName,
   thumbnails,
-  songLabel,
+  leftLabel,
+  rightLabel,
   correlationLabel
 }: {
   pairs: CommunityStats['correlations'];
   songName: (id: string) => string;
   thumbnails: Map<string, string | undefined>;
-  songLabel: string;
+  leftLabel: string;
+  rightLabel: string;
   correlationLabel: string;
 }) {
   return (
     <Table.Root size="sm">
       <Table.Head>
         <Table.Row>
-          <Table.Header>{songLabel}</Table.Header>
-          <Table.Header>{songLabel}</Table.Header>
+          <Table.Header>{leftLabel}</Table.Header>
+          <Table.Header>{rightLabel}</Table.Header>
           <Table.Header>{correlationLabel}</Table.Header>
         </Table.Row>
       </Table.Head>

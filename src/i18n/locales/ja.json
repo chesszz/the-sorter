@@ -55,8 +55,11 @@
     "one_sided_matchups": "最も一方的な対決",
     "split": "内訳",
     "correlations": "相関の強い楽曲",
-    "positive_correlations": "この曲が好きな人が好きな曲",
-    "negative_correlations": "この曲が好きな人が好きではない曲",
+    "positive_correlations": "正の相関が強い楽曲",
+    "negative_correlations": "負の相関が強い楽曲",
+    "loved_this": "この曲が好きな人",
+    "also_liked_this": "好きな曲",
+    "did_not_like_this": "好きではない曲",
     "correlation": "相関係数",
     "mainstream": "最も平均的な意見",
     "contrarian": "最も個性的な意見"

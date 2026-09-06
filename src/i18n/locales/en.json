@@ -56,8 +56,11 @@
     "one_sided_matchups": "Most One-Sided Matchups",
     "split": "Split",
     "correlations": "Strongest Song Correlations",
-    "positive_correlations": "People who loved this also liked",
-    "negative_correlations": "People who loved this did not like",
+    "positive_correlations": "Strongest Positive Correlations",
+    "negative_correlations": "Strongest Negative Correlations",
+    "loved_this": "People who loved this",
+    "also_liked_this": "Also liked this",
+    "did_not_like_this": "Did not like this",
     "correlation": "Correlation",
     "mainstream": "Most Mainstream Opinions",
     "contrarian": "Most Contrarian Opinions"
