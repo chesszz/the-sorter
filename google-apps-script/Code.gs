@@ -13,6 +13,27 @@ const HEADERS = [
   'ranking_summary'
 ];
 
+// The Apps Script deployment cannot import data/songs.json, so keep the
+// submission allowlist here in sync with the public song list.
+const SONG_TITLES = {
+  1: '薔薇色の月',
+  2: 'botばっか',
+  3: '乙女心中',
+  4: '魔性少女',
+  5: 'そっくりさん',
+  6: '花喰み',
+  7: 'HANAGATAMI',
+  8: 'ホラークイーン',
+  9: 'キミと××××したいだけ',
+  10: '輪廻る',
+  11: 'もーいーかい？',
+  12: '人魚姫の歌',
+  13: 'ノア',
+  14: 'おともだち',
+  15: 'すき、きらい',
+  16: 'ゾクゾク'
+};
+
 function setup() {
   const sheet = getSheet_();
   sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
@@ -50,16 +71,26 @@ function doPost(event) {
         : event.postData.contents || '{}';
     const body = JSON.parse(bodyText);
     if (body.action === 'delete') {
-      return postMessage_(Object.assign(deleteSubmission_(body), { requestId: String(body.requestId || '') }));
+      return postMessage_(
+        Object.assign(deleteSubmission_(body), { requestId: String(body.requestId || '') })
+      );
     }
     if (body.action === 'submit') {
-      return postMessage_(Object.assign(saveSubmission_(body), { requestId: String(body.requestId || '') }));
+      return postMessage_(
+        Object.assign(saveSubmission_(body), { requestId: String(body.requestId || '') })
+      );
     }
-    return postMessage_({ ok: false, message: 'Unknown action.', requestId: String(body.requestId || '') });
+    return postMessage_({
+      ok: false,
+      message: 'Unknown action.',
+      requestId: String(body.requestId || '')
+    });
   } catch (error) {
     let requestId = '';
     try {
-      requestId = String(JSON.parse(event.parameter?.payload || event.postData?.contents || '{}').requestId || '');
+      requestId = String(
+        JSON.parse(event.parameter?.payload || event.postData?.contents || '{}').requestId || ''
+      );
     } catch (_) {}
     return postMessage_({ ok: false, message: error.message || 'Request failed.', requestId });
   }
@@ -68,14 +99,16 @@ function doPost(event) {
 function deleteSubmission_(body) {
   const submissionId = String(body.submissionId || '');
   const editToken = String(body.editToken || '');
-  if (!submissionId || !editToken) throw new Error('Your edit link is required to delete this ranking.');
+  if (!submissionId || !editToken)
+    throw new Error('Your edit link is required to delete this ranking.');
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     const sheet = getSheet_();
     const existing = readRows_(sheet).find((row) => row.submission_id === submissionId);
     if (!existing) return { ok: true };
-    if (existing.edit_token_hash !== hash_(editToken)) throw new Error('That edit link is invalid or expired.');
+    if (existing.edit_token_hash !== hash_(editToken))
+      throw new Error('That edit link is invalid or expired.');
     sheet.deleteRow(existing.rowNumber);
     return { ok: true };
   } finally {
@@ -107,9 +140,7 @@ function saveSubmission_(body) {
       );
       if (!existing) {
         const sameBrowser = rows.find(
-          (row) =>
-            row.submission_id === submissionId &&
-            row.browser_id_hash === browserHash
+          (row) => row.submission_id === submissionId && row.browser_id_hash === browserHash
         );
         if (sameBrowser) {
           updateRow_(sheet, sameBrowser.rowNumber, {
@@ -164,10 +195,21 @@ function validateRanking_(ranking) {
   }
   const seen = {};
   return ranking.map((entry) => {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error('The ranking contains an invalid song entry.');
+    }
     const songId = String(entry.songId || '');
-    const rank = Number(entry.rank);
-    if (!/^\d+$/.test(songId) || seen[songId] || !Number.isFinite(rank) || rank < 1) {
-      throw new Error('The ranking contains invalid or duplicate songs.');
+    const songTitle = String(entry.songTitle || '').trim();
+    const rank = entry.rank;
+    if (!Object.prototype.hasOwnProperty.call(SONG_TITLES, songId)) {
+      throw new Error('The ranking contains an unknown song.');
+    }
+    if (seen[songId]) throw new Error('The ranking contains duplicate songs.');
+    if (songTitle !== SONG_TITLES[songId]) {
+      throw new Error('The ranking contains an invalid song title.');
+    }
+    if (typeof rank !== 'number' || !Number.isInteger(rank) || rank < 1 || rank > ranking.length) {
+      throw new Error('The ranking contains an invalid rank position.');
     }
     seen[songId] = true;
     return { songId, rank };
@@ -184,7 +226,10 @@ function formatRankingSummary_(submittedRanking, ranking) {
     });
   }
   return ranking
-    .map((entry) => `${entry.rank}. ${titles[entry.songId] || '(title unavailable)'} (ID: ${entry.songId})`)
+    .map(
+      (entry) =>
+        `${entry.rank}. ${titles[entry.songId] || '(title unavailable)'} (ID: ${entry.songId})`
+    )
     .join('\n');
 }
 
@@ -223,7 +268,7 @@ function getStats_(requestedSongIds) {
     const values = songScores[songId];
     return {
       songId,
-      sentiment: round_(average_(values) * 100),
+      sentiment: roundOneDecimal_(average_(values) * 100),
       sampleSize: values.length
     };
   });
@@ -416,6 +461,10 @@ function correlation_(left, right) {
 
 function round_(value) {
   return Math.round(value * 100) / 100;
+}
+
+function roundOneDecimal_(value) {
+  return Math.round(value * 10) / 10;
 }
 
 function json_(value, callback) {

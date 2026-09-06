@@ -15,7 +15,7 @@ import {
 } from '~/utils/communityRankings';
 
 function formatPercent(value: number) {
-  return `${Math.round(value)}%`;
+  return `${value.toFixed(1)}%`;
 }
 
 function formatCorrelation(value: number) {
