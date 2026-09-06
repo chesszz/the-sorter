@@ -33,8 +33,8 @@ type ScreenshotOptions = {
 const loadImage = (src: string): Promise<HTMLImageElement | undefined> =>
   new Promise((resolve) => {
     const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => resolve(undefined);
+    image.addEventListener('load', () => resolve(image), { once: true });
+    image.addEventListener('error', () => resolve(undefined), { once: true });
     image.src = src;
   });
 
