@@ -11,6 +11,7 @@ const HEADER_HEIGHT = 44;
 const ROW_HEIGHT = 97;
 const THUMBNAIL_SIZE = 96;
 const FOOTER_HEIGHT = 48;
+const PHANTOM_RED = '#cc1515';
 
 type ScreenshotOptions = {
   title?: string;
@@ -155,7 +156,7 @@ export async function renderSongRankingScreenshot(options: ScreenshotOptions): P
       headerY
     );
 
-    context.strokeStyle = '#e6e4e8';
+    context.strokeStyle = PHANTOM_RED;
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(x, tableTop + HEADER_HEIGHT - 0.5);
@@ -167,7 +168,7 @@ export async function renderSongRankingScreenshot(options: ScreenshotOptions): P
       const songColor = getSongColor(song);
       context.fillStyle = songColor;
       context.fillRect(x, rowY, 8, ROW_HEIGHT);
-      context.strokeStyle = songColor;
+      context.strokeStyle = PHANTOM_RED;
       context.beginPath();
       context.moveTo(x, rowY + ROW_HEIGHT - 0.5);
       context.lineTo(x + columnWidth, rowY + ROW_HEIGHT - 0.5);
