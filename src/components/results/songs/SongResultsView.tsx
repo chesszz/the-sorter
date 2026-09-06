@@ -422,7 +422,16 @@ export function SongResultsView({
         )}
       </Stack>
       {showRenderingCanvas && (
-        <Box position="absolute" w="0" h="0" overflow="hidden">
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: '-10000px',
+            width: '1280px',
+            overflow: 'visible',
+            pointerEvents: 'none'
+          }}
+        >
           <Stack id="results" width="1280px" p="4" bgColor="bg.canvas">
             {title && (
               <Heading fontSize="2xl" fontWeight="bold">
@@ -443,7 +452,7 @@ export function SongResultsView({
                 ))}
             </HStack>
           </Stack>
-        </Box>
+        </div>
       )}
     </>
   );
