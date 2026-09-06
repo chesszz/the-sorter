@@ -53,8 +53,11 @@
     "sentiment": "Sentiment",
     "sample_size": "Rankings",
     "matchups": "Most Divisive Matchups",
+    "one_sided_matchups": "Most One-Sided Matchups",
     "split": "Split",
     "correlations": "Strongest Song Correlations",
+    "positive_correlations": "People who loved this also liked",
+    "negative_correlations": "People who loved this did not like",
     "correlation": "Correlation",
     "mainstream": "Most Mainstream Opinions",
     "contrarian": "Most Contrarian Opinions"

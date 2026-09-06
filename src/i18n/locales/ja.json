@@ -52,8 +52,11 @@
     "sentiment": "人気度",
     "sample_size": "回答数",
     "matchups": "意見が分かれる対決",
+    "one_sided_matchups": "最も一方的な対決",
     "split": "内訳",
     "correlations": "相関の強い楽曲",
+    "positive_correlations": "この曲が好きな人が好きな曲",
+    "negative_correlations": "この曲が好きな人が好きではない曲",
     "correlation": "相関係数",
     "mainstream": "最も平均的な意見",
     "contrarian": "最も個性的な意見"

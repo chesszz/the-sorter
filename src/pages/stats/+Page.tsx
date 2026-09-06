@@ -68,8 +68,21 @@ export function Page() {
       return aSplit - bSplit;
     })
     .slice(0, 10);
-  const correlations = [...(stats?.correlations ?? [])]
-    .toSorted((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation))
+  const oneSidedMatchups = [...(stats?.matchups ?? [])]
+    .filter((matchup) => matchup.total > 0)
+    .toSorted((a, b) => {
+      const aSplit = Math.max(a.leftWins, a.rightWins) / a.total;
+      const bSplit = Math.max(b.leftWins, b.rightWins) / b.total;
+      return bSplit - aSplit;
+    })
+    .slice(0, 10);
+  const positiveCorrelations = [...(stats?.correlations ?? [])]
+    .filter((pair) => pair.correlation > 0)
+    .toSorted((a, b) => b.correlation - a.correlation)
+    .slice(0, 10);
+  const negativeCorrelations = [...(stats?.correlations ?? [])]
+    .filter((pair) => pair.correlation < 0)
+    .toSorted((a, b) => a.correlation - b.correlation)
     .slice(0, 10);
   const participantLimit = Math.min(10, Math.floor((stats?.participants.length ?? 0) / 2));
   const mainstream = [...(stats?.participants ?? [])]
@@ -148,71 +161,57 @@ export function Page() {
                 flex="1"
                 minW={{ base: 'full', md: '0' }}
               >
-                <Table.Root size="sm">
-                  <Table.Head>
-                    <Table.Row>
-                      <Table.Header>{t('community.song')}</Table.Header>
-                      <Table.Header>{t('community.song')}</Table.Header>
-                      <Table.Header>{t('community.split')}</Table.Header>
-                    </Table.Row>
-                  </Table.Head>
-                  <Table.Body>
-                    {divisiveMatchups.map((matchup) => (
-                      <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
-                        <Table.Cell>
-                          <SongLabel
-                            name={songName(matchup.leftSongId)}
-                            thumbnail={thumbnails.get(matchup.leftSongId)}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>
-                          <SongLabel
-                            name={songName(matchup.rightSongId)}
-                            thumbnail={thumbnails.get(matchup.rightSongId)}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>
-                          {matchup.leftWins}–{matchup.rightWins}
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
+                <MatchupTable
+                  matchups={divisiveMatchups}
+                  songName={songName}
+                  thumbnails={thumbnails}
+                  songLabel={t('community.song')}
+                  splitLabel={t('community.split')}
+                />
               </StatsSection>
 
               <StatsSection
-                title={t('community.correlations')}
+                title={t('community.one_sided_matchups')}
                 flex="1"
                 minW={{ base: 'full', md: '0' }}
               >
-                <Table.Root size="sm">
-                  <Table.Head>
-                    <Table.Row>
-                      <Table.Header>{t('community.song')}</Table.Header>
-                      <Table.Header>{t('community.song')}</Table.Header>
-                      <Table.Header>{t('community.correlation')}</Table.Header>
-                    </Table.Row>
-                  </Table.Head>
-                  <Table.Body>
-                    {correlations.map((pair) => (
-                      <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
-                        <Table.Cell>
-                          <SongLabel
-                            name={songName(pair.leftSongId)}
-                            thumbnail={thumbnails.get(pair.leftSongId)}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>
-                          <SongLabel
-                            name={songName(pair.rightSongId)}
-                            thumbnail={thumbnails.get(pair.rightSongId)}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
+                <MatchupTable
+                  matchups={oneSidedMatchups}
+                  songName={songName}
+                  thumbnails={thumbnails}
+                  songLabel={t('community.song')}
+                  splitLabel={t('community.split')}
+                />
+              </StatsSection>
+            </HStack>
+
+            <HStack gap="8" alignItems="start" flexWrap="wrap">
+              <StatsSection
+                title={t('community.positive_correlations')}
+                flex="1"
+                minW={{ base: 'full', md: '0' }}
+              >
+                <CorrelationTable
+                  pairs={positiveCorrelations}
+                  songName={songName}
+                  thumbnails={thumbnails}
+                  songLabel={t('community.song')}
+                  correlationLabel={t('community.correlation')}
+                />
+              </StatsSection>
+
+              <StatsSection
+                title={t('community.negative_correlations')}
+                flex="1"
+                minW={{ base: 'full', md: '0' }}
+              >
+                <CorrelationTable
+                  pairs={negativeCorrelations}
+                  songName={songName}
+                  thumbnails={thumbnails}
+                  songLabel={t('community.song')}
+                  correlationLabel={t('community.correlation')}
+                />
               </StatsSection>
             </HStack>
 
@@ -372,6 +371,98 @@ function SongLabel({ name, thumbnail }: { name: string; thumbnail?: string }) {
       )}
       <Text>{name}</Text>
     </HStack>
+  );
+}
+
+function MatchupTable({
+  matchups,
+  songName,
+  thumbnails,
+  songLabel,
+  splitLabel
+}: {
+  matchups: CommunityStats['matchups'];
+  songName: (id: string) => string;
+  thumbnails: Map<string, string | undefined>;
+  songLabel: string;
+  splitLabel: string;
+}) {
+  return (
+    <Table.Root size="sm">
+      <Table.Head>
+        <Table.Row>
+          <Table.Header>{songLabel}</Table.Header>
+          <Table.Header>{songLabel}</Table.Header>
+          <Table.Header>{splitLabel}</Table.Header>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        {matchups.map((matchup) => (
+          <Table.Row key={`${matchup.leftSongId}-${matchup.rightSongId}`}>
+            <Table.Cell>
+              <SongLabel
+                name={songName(matchup.leftSongId)}
+                thumbnail={thumbnails.get(matchup.leftSongId)}
+              />
+            </Table.Cell>
+            <Table.Cell>
+              <SongLabel
+                name={songName(matchup.rightSongId)}
+                thumbnail={thumbnails.get(matchup.rightSongId)}
+              />
+            </Table.Cell>
+            <Table.Cell>
+              {matchup.leftWins}–{matchup.rightWins}
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
+  );
+}
+
+function CorrelationTable({
+  pairs,
+  songName,
+  thumbnails,
+  songLabel,
+  correlationLabel
+}: {
+  pairs: CommunityStats['correlations'];
+  songName: (id: string) => string;
+  thumbnails: Map<string, string | undefined>;
+  songLabel: string;
+  correlationLabel: string;
+}) {
+  return (
+    <Table.Root size="sm">
+      <Table.Head>
+        <Table.Row>
+          <Table.Header>{songLabel}</Table.Header>
+          <Table.Header>{songLabel}</Table.Header>
+          <Table.Header>{correlationLabel}</Table.Header>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        {pairs.map((pair) => (
+          <Table.Row key={`${pair.leftSongId}-${pair.rightSongId}`}>
+            <Table.Cell>
+              <SongLabel
+                name={songName(pair.leftSongId)}
+                thumbnail={thumbnails.get(pair.leftSongId)}
+              />
+            </Table.Cell>
+            <Table.Cell>
+              <SongLabel
+                name={songName(pair.rightSongId)}
+                thumbnail={thumbnails.get(pair.rightSongId)}
+              />
+            </Table.Cell>
+            <Table.Cell>{formatCorrelation(pair.correlation)}</Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
   );
 }
 
