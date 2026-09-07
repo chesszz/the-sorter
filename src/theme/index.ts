@@ -7,7 +7,7 @@ export const theme: PartialTheme = {
         //@ts-expect-error TODO: incompatible type
         WebkitTextStrokeWidth: '0.23',
         //@ts-expect-error TODO: incompatible type
-        WebkitTextStrokeColor: '{colors.fg.default}'
+        WebkitTextStrokeColor: '{colors.fg.stroke}'
       }
     }
   },
@@ -23,6 +23,7 @@ export const theme: PartialTheme = {
       },
       fg: {
         default: { value: { _light: '#050406', _dark: '#ffe8e8' } },
+        stroke: { value: { _light: '#050406', _dark: '#2b0b0b' } },
         muted: { value: { _light: '#595959', _dark: '#cfdfe6' } },
         subtle: { value: { _light: '#767676', _dark: '#a5a5a5' } },
         disabled: { value: { _light: '#a5a5a5', _dark: '#595959' } },
