@@ -63,9 +63,10 @@ export function Page() {
   const divisiveMatchups = [...(stats?.matchups ?? [])]
     .filter((matchup) => matchup.total > 0)
     .toSorted((a, b) => {
-      const aSplit = Math.max(a.leftWins, a.rightWins) / a.total;
-      const bSplit = Math.max(b.leftWins, b.rightWins) / b.total;
-      return aSplit - bSplit;
+      const aMargin = Math.abs(a.leftWins - a.rightWins) / a.total;
+      const bMargin = Math.abs(b.leftWins - b.rightWins) / b.total;
+      if (aMargin !== bMargin) return aMargin - bMargin;
+      return Math.max(b.leftWins, b.rightWins) - Math.max(a.leftWins, a.rightWins);
     })
     .slice(0, 10);
   const oneSidedMatchups = [...(stats?.matchups ?? [])]
